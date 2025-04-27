@@ -1,0 +1,61 @@
+name: Create Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # 获取完整历史以便生成更新日志
+
+      - name: Generate start.server.bat with dynamic variables
+        run: |
+          # 获取当前日期时间
+          CURRENT_DATE=$(date '+%Y.%m.%d %H:%M')
+          
+          # 获取版本号（从release标签）
+          VERSION=${GITHUB_REF#refs/tags/}
+          
+          # 获取当前分支名
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          
+          # 获取许可证信息（默认为MIT）
+          LICENSE="MIT License"
+          
+          # 读取原始txt文件
+          cat start.server.txt > start.server.bat
+          
+          # 替换变量
+          sed -i "s/set \"APP_VERSION=.*\"/set \"APP_VERSION=$VERSION\"/" start.server.bat
+          sed -i "s/set \"APP_LICENSE=.*\"/set \"APP_LICENSE=$LICENSE\"/" start.server.bat
+          sed -i "s/Set \"APP_BRANCH=.*\"/Set \"APP_BRANCH=$BRANCH\"/" start.server.bat
+          sed -i "s/Set \"APP_DATE=.*\"/Set \"APP_DATE=$CURRENT_DATE\"/" start.server.bat
+
+      - name: Generate changelog
+        id: changelog
+        uses: metcalfc/changelog-generator@v4.0.1
+        with:
+          myToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update release with changelog
+        uses: tubone24/update_release@v1.3.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_name: ${{ github.event.release.name }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          
+      - name: Upload start.server.bat to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./start.server.bat
+          asset_name: start.server.bat
+          asset_content_type: application/octet-stream
