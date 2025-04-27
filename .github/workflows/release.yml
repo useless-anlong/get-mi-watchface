@@ -1,8 +1,21 @@
-name: Create Release
+name: Manual Create Release
 
 on:
-  release:
-    types: [created]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号 (例如: v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+      release_name:
+        description: 'Release 标题'
+        required: true
+        default: 'Release v1.0.0'
+      prerelease:
+        description: '是否为预发布版本'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   build:
@@ -18,8 +31,8 @@ jobs:
           # 获取当前日期时间
           CURRENT_DATE=$(date '+%Y.%m.%d %H:%M')
           
-          # 获取版本号（从release标签）
-          VERSION=${GITHUB_REF#refs/tags/}
+          # 获取版本号（从输入参数）
+          VERSION=${{ github.event.inputs.version }}
           
           # 获取当前分支名
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -42,20 +55,24 @@ jobs:
         with:
           myToken: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update release with changelog
-        uses: tubone24/update_release@v1.3.1
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          release_name: ${{ github.event.release.name }}
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: ${{ github.event.inputs.release_name }}
           body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: ${{ github.event.inputs.prerelease }}
           
       - name: Upload start.server.bat to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./start.server.bat
           asset_name: start.server.bat
           asset_content_type: application/octet-stream
