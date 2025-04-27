@@ -20,6 +20,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 明确授予写入内容的权限
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -69,35 +71,25 @@ jobs:
           fi
           
           # 设置输出变量
-          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
-          echo "$CHANGELOG" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.event.inputs.version }}
-          release_name: ${{ github.event.inputs.release_name }}
+          name: ${{ github.event.inputs.release_name }}
           body: |
             ## 更新日志
             
-            ${{ env.CHANGELOG }}
+            ${{ steps.changelog.outputs.changelog }}
             
             ## 下载
             
             - start.server.bat: 启动服务器脚本
           draft: false
           prerelease: ${{ github.event.inputs.prerelease }}
-          
-      - name: Upload start.server.bat to release
-        uses: actions/upload-release-asset@v1
+          files: ./start.server.bat
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./start.server.bat
-          asset_name: start.server.bat
-          asset_content_type: application/octet-stream
