@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>获取并展示JSON数据</title>
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link rel="stylesheet" href="./styles/main.css">
+</head>
+
+<body>
+    <div class="progress-bar" id="progressBar" style="width: 0vw;"></div>
+    <div id="console">
+        <div class="fetch-console-container">
+            <h1>Params</h1>
+            <table class="settings-table">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Value</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id-start</td>
+                        <td><select id="idSelectStart"></select></td>
+                        <td>选择起始ID范围</td>
+                    </tr>
+                    <tr>
+                        <td>id-end</td>
+                        <td><select id="idSelectEnd"></select></td>
+                        <td>选择结束ID范围</td>
+                    </tr>
+                    <tr>
+                        <td>model</td>
+                        <td><select id="modelSelect"></select></td>
+                        <td>选择设备型号</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="warningBox" style="display: none; color: #ff4d4f; margin: 10px 0;">
+            当前请求的表盘数量为<span id="requestCount"></span>，请求时间可能较长。
+        </div>
+        <div id="progress-container">
+            <div class="progress-text" id="progressText">Waiting to launch Params...</div>
+            <div class="button-group">
+                <button onclick="fetchData()" id="startBtn">
+                    Launch
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18"
+                        height="18" viewBox="0 0 14 14" fill="none">
+                        <path fill-rule="evenodd" fill="#CCCCCC"
+                            d="M12.2107 6.36029L2.54449 2.0642C1.9818 1.81411 1.39362 2.36004 1.60114 2.93977L2.79036 6.26205C2.85471 6.44182 3.05886 6.56252 3.24981 6.56246C3.24986 6.56246 3.24991 6.56246 3.24996 6.56246L6.64996 6.56246C6.67868 6.56246 6.70713 6.56526 6.73531 6.57087C6.76348 6.57647 6.79084 6.58477 6.81738 6.59576C6.84392 6.60675 6.86913 6.62023 6.89302 6.63619C6.9169 6.65215 6.939 6.67029 6.95932 6.6906C6.97963 6.71091 6.99777 6.73301 7.01373 6.7569C7.02969 6.78079 7.04316 6.806 7.05416 6.83254C7.06515 6.85908 7.07345 6.88644 7.07905 6.91461C7.08465 6.94278 7.08746 6.97123 7.08746 6.99996C7.08746 7.02869 7.08465 7.05714 7.07905 7.08531C7.07345 7.11348 7.06515 7.14084 7.05416 7.16738C7.04316 7.19392 7.02969 7.21913 7.01373 7.24302C6.99777 7.26691 6.97963 7.28901 6.95932 7.30932C6.939 7.32963 6.9169 7.34777 6.89302 7.36373C6.86913 7.37969 6.84392 7.39317 6.81738 7.40416C6.79084 7.41515 6.76348 7.42345 6.73531 7.42905C6.70713 7.43466 6.67868 7.43746 6.64996 7.43746L3.24996 7.43746C3.24996 7.43746 3.24996 7.43746 3.24996 7.43746C3.05901 7.43746 2.85471 7.5581 2.79036 7.73787L1.60114 11.0602C1.39362 11.6399 1.9818 12.1858 2.54449 11.9357L12.2107 7.63963C12.765 7.39328 12.765 6.60663 12.2107 6.36029Z">
+                        </path>
+                    </svg>
+                </button>
+                <button onclick="pauseRequest()" id="pauseBtn" style="display:none">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14"
+                        height="14" viewBox="0 0 14 14" fill="none">
+                        <path
+                            d="M3.85 1.4L3.15 1.4C2.3768 1.4 1.75 2.0268 1.75 2.8L1.75 11.2C1.75 11.9732 2.3768 12.6 3.15 12.6L3.85 12.6C4.6232 12.6 5.25 11.9732 5.25 11.2L5.25 2.8C5.25 2.0268 4.6232 1.4 3.85 1.4ZM10.85 1.4L10.15 1.4C9.3768 1.4 8.75 2.0268 8.75 2.8L8.75 11.2C8.75 11.9732 9.3768 12.6 10.15 12.6L10.85 12.6C11.6232 12.6 12.25 11.9732 12.25 11.2L12.25 2.8C12.25 2.0268 11.6232 1.4 10.85 1.4Z"
+                            fill-rule="evenodd" fill="#000000">
+                        </path>
+                    </svg>
+                    Pause
+                </button>
+                <button onclick="stopRequest()" id="stopBtn" style="display:none">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14"
+                        height="14" viewBox="0 0 14 14" fill="none">
+                        <rect x="1.4000015258789062" y="1.3999996185302734" width="11.200000762939453"
+                            height="11.200000762939453" rx="2.0999999999999996" fill="#000000">
+                        </rect>
+                    </svg>
+                    Stop
+                </button>
+            </div>
+        </div>
+        <div id="logs"></div>
+    </div>
+    <div id="details-container" class="details-container"></div>
+    <script>
+        const baseUrl = 'http://localhost:3000/api/watchface/prize/detail?';
+
+        // 在现有 script 标签中添加
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabItems = document.querySelectorAll('.tab-item');
+
+            tabItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // 移除所有活动状态
+                    tabItems.forEach(tab => tab.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                    // 添加当前选中项的活动状态
+                    item.classList.add('active');
+                    const tabId = item.dataset.tab;
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        });
+
+        const wfIdRanges = [
+            // 120917300000-120917300999 series
+            "120917300000-120917300999",
+
+            // 366260000-366270000 series
+            "366260000-366260999",
+            "366261000-366261999",
+            "366262000-366262999",
+            "366263000-366263999",
+            "366264000-366264999",
+            "366265000-366265999",
+            "366266000-366266999",
+            "366267000-366267999",
+            "366268000-366268999",
+            "366269000-366269999",
+            "366270000-366270999",
+
+            // 120917340000-120917355000 series
+            "120917340000-120917340999",
+            "120917341000-120917341999",
+            "120917342000-120917342999",
+            "120917343000-120917343999",
+            "120917344000-120917344999",
+            "120917345000-120917345999",
+            "120917346000-120917346999",
+            "120917347000-120917347999",
+            "120917348000-120917348999",
+            "120917349000-120917349999",
+            "120917350000-120917350999",
+            "120917351000-120917351999",
+            "120917352000-120917352999",
+            "120917353000-120917353999",
+            "120917354000-120917354999",
+            "120917355000-120917355999"
+        ];
+
+        const modelIds = [
+            "miwear.watch.m66cn",
+            "lchz.watch.m67",
+            "lchz.watch.m67ys",
+            "mijia.watch.n62",
+            "lchz.watch.n65",
+            "miwear.watch.n66cn",
+            "miwear.watch.n66tc",
+            "miwear.watch.n67cn",
+            "miwear.watch.n67gl",
+            "miwear.watch.n69cn",
+            "miwear.watch.n69gl",
+            "mijia.watch.o62",
+            "mijia.watch.o62m",
+            "mijia.watch.o62gl",
+            "miwear.watch.o65",
+            "miwear.watch.o65m",
+            "miwear.watch.o65w",
+            "miwear.watch.o66cn"
+        ];
+
+        // 页面加载完成后初始化下拉菜单
+        document.addEventListener('DOMContentLoaded', function () {
+            const startSelect = document.getElementById('idSelectStart');
+            const endSelect = document.getElementById('idSelectEnd');
+            const modelSelect = document.getElementById('modelSelect');
+            const warningBox = document.getElementById('warningBox');
+            const requestCountSpan = document.getElementById('requestCount');
+
+            // 填充起始值下拉框
+            wfIdRanges.forEach(range => {
+                const [start] = range.split('-');
+                const option = document.createElement('option');
+                option.value = range;
+                option.textContent = start;
+                startSelect.appendChild(option);
+            });
+
+            function getSeriesType(id) {
+                if (id.startsWith('120917300')) {
+                    return 'series1';
+                } else if (id.startsWith('36626')) {
+                    return 'series2';
+                } else if (id.startsWith('12091734') || id.startsWith('12091735')) {
+                    return 'series3';
+                }
+            }
+
+            // 当起始值变化时更新结束值选项
+            startSelect.addEventListener('change', function () {
+                const selectedRange = this.value;
+                const [selectedStart] = selectedRange.split('-');
+                const selectedSeries = getSeriesType(selectedStart);
+
+                endSelect.innerHTML = ''; // 清空现有选项
+
+                // 只添加同系列且大于等于当前选择区间的结束值选项
+                wfIdRanges.forEach(range => {
+                    const [start, end] = range.split('-');
+                    if (getSeriesType(start) === selectedSeries && range >= selectedRange) {
+                        const option = document.createElement('option');
+                        option.value = range;
+                        option.textContent = end;
+                        endSelect.appendChild(option);
+                    }
+                });
+            });
+
+            // 触发初始的结束值填充
+            startSelect.dispatchEvent(new Event('change'));
+
+            // 填充model下拉框
+            modelIds.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                modelSelect.appendChild(option);
+            });
+
+            // 检查请求数量并显示/隐藏警告
+            function checkRequestCount() {
+                const startRange = startSelect.value;
+                const endRange = endSelect.value;
+                const [startId] = startRange.split('-');
+                const [, endId] = endRange.split('-');
+
+                const requestCount = Math.floor((parseInt(endId) - parseInt(startId)) / 1000) + 1;
+
+                if (requestCount >= 2000) {
+                    requestCountSpan.textContent = requestCount;
+                    warningBox.style.display = 'block';
+                } else {
+                    warningBox.style.display = 'none';
+                }
+            }
+
+            // 在起始值和结束值的change事件中添加检查
+            startSelect.addEventListener('change', checkRequestCount);
+            endSelect.addEventListener('change', checkRequestCount);
+        });
+
+        let eventSource = null;
+        let isPaused = false;
+        let currentProgress = {
+            completed: 0,
+            total: 0
+        };
+
+        async function fetchData() {
+            const startRange = document.getElementById('idSelectStart').value;
+            const endRange = document.getElementById('idSelectEnd').value;
+            const model = document.getElementById('modelSelect').value;
+
+            const [start] = startRange.split('-');
+            const [, end] = endRange.split('-');
+
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            // const resultDiv = document.getElementById('result');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const logsDiv = document.getElementById('logs');
+            const detailsContainer = document.getElementById('details-container');
+
+            startBtn.style.display = 'none';
+            pauseBtn.style.display = 'flex';
+            stopBtn.style.display = 'flex';
+
+            // resultDiv.innerHTML = '';
+            logsDiv.innerHTML = '';
+            detailsContainer.innerHTML = '';
+            progressBar.style.width = '0%';
+            progressText.textContent = 'Waiting to launch Params...';
+
+            eventSource = new EventSource(`/fetch-data?model=${model}&startId=${start}&endId=${end}`);
+
+            eventSource.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+
+                switch (data.type) {
+                    case 'progress':
+                        currentProgress.completed = data.completed;
+                        currentProgress.total = data.total;
+                        progressBar.style.width = `${data.progress}%`;
+                        progressText.textContent = `${Math.round(data.progress)}% (${data.completed}/${data.total})`;
+                        break;
+
+                    case 'log':
+                        const table = document.getElementById('logTable') || createLogTable();
+                        const row = table.insertRow();
+                        const cell = row.insertCell();
+                        cell.className = `log-${data.status}`;
+                        cell.innerHTML = data.message;
+                        logsDiv.scrollTop = logsDiv.scrollHeight;
+                        break;
+
+                    case 'detail':
+                        const details = document.createElement('details');
+                        const summary = document.createElement('summary');
+                        const displayName = data.data.data.recommend_list[0].display_name;
+
+                        // 创建图片容器
+                        const imgContainer = document.createElement('div');
+                        imgContainer.classList.add('img-container');
+
+                        const previewImg = document.createElement('img');
+                        previewImg.src = data.data.data.recommend_list[0].icon;
+                        previewImg.classList.add('preview-img');
+
+                        const aodImg = document.createElement('img');
+                        aodImg.src = data.data.data.recommend_list[0].aod_icon;
+                        aodImg.classList.add('preview-img');
+                        aodImg.classList.add('aod');
+
+                        // 添加图片到容器
+                        imgContainer.appendChild(previewImg);
+                        imgContainer.appendChild(aodImg);
+
+                        // 创建标题容器
+                        const titleContainer = document.createElement('div');
+                        titleContainer.innerHTML = `<h3>${displayName}</h3><span class="watchface-id-span">ID ${data.id}</span>`;
+                        titleContainer.classList.add('title-container');
+
+                        // 添加到summary
+                        summary.appendChild(titleContainer);
+                        summary.appendChild(imgContainer);
+
+                        // 创建下载按钮容器
+
+                        const btnContainer = document.createElement('div');
+                        btnContainer.classList.add('btn-container');
+
+                        const binBtn = document.createElement('a');
+                        binBtn.href = data.data.data.recommend_list[0].config_file;
+                        binBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" viewBox="0 0 24 24" fill="none"><path stroke="rgba(26, 12, 33, 1)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"  d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM15 12.4444L12 16M12 16L9 12.4444M12 16L12 8"></path></svg>下载BIN文件';
+                        binBtn.className = 'download-btn';
+                        binBtn.target = '_blank';
+
+                        const mwzBtn = document.createElement('a');
+                        mwzBtn.href = data.data.data.recommend_list[0].config_file_v2;
+                        mwzBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" viewBox="0 0 24 24" fill="none"><path stroke="rgba(26, 12, 33, 1)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"  d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM15 12.4444L12 16M12 16L9 12.4444M12 16L12 8"></path></svg>下载MWZ文件';
+                        mwzBtn.className = 'download-btn';
+                        mwzBtn.target = '_blank';
+
+                        const jsonBtn = document.createElement('a');
+                        jsonBtn.href = `https://watch-appstore.iot.mi.com/api/watchface/prize/detail?model=${document.getElementById('modelSelect').value}&id=${data.id}`;
+                        jsonBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" viewBox="0 0 24 24" fill="none"><path fill="rgba(26, 12, 33, 1)"  d="M9.93604 2.59498M9.93604 2.59498Q10.5849 1.94609 11.4334 1.59642Q12.2818 1.24675 13.1995 1.25003L13.1968 2.00002L13.1995 1.25003L20.064 1.27453L20.064 1.27453L20.064 1.27453Q20.6043 1.27646 21.0985 1.4865Q21.5755 1.68919 21.9432 2.05684Q22.3108 2.42447 22.5135 2.90147Q22.7235 3.39573 22.7255 3.936L22.7255 3.936L22.75 10.8005L22.75 10.8005L22.75 10.8005Q22.7532 11.7182 22.4036 12.5666Q22.0539 13.4151 21.405 14.064L20.8747 13.5336L21.405 14.064L14.064 21.405L14.064 21.405L14.064 21.405Q13.4037 22.0653 12.5445 22.4137Q11.7152 22.75 10.8169 22.75Q9.9186 22.75 9.08928 22.4137Q8.23009 22.0653 7.56983 21.405L7.56983 21.405L2.59498 16.4302L3.12531 15.8998L2.59498 16.4302C0.801672 14.6369 0.801675 11.7293 2.59498 9.93604L3.12531 10.4664L2.59498 9.93604L9.93604 2.59498L10.4664 3.12531L9.93604 2.59498ZM10.9967 3.65564L10.9967 3.65564L3.65564 10.9967L3.65564 10.9967C2.44812 12.2042 2.44812 14.162 3.65564 15.3695L3.65564 15.3695L8.63049 20.3444L8.10015 20.8747L8.63048 20.3444Q9.07566 20.7895 9.65297 21.0236Q10.2112 21.25 10.8169 21.25Q11.4226 21.25 11.9808 21.0236Q12.5581 20.7895 13.0033 20.3444L13.5336 20.8747L13.0033 20.3444L13.5336 20.8747L13.0033 20.3444L20.3444 13.0033L20.3444 13.0033Q20.7813 12.5664 21.0167 11.9951Q21.2522 11.4238 21.25 10.8059L22 10.8032L21.25 10.8059L22 10.8032L21.25 10.8059L21.2255 3.94136L21.9755 3.93868L21.2255 3.94136Q21.2238 3.45875 20.8825 3.1175Q20.5413 2.77624 20.0586 2.77452L20.0613 2.02452L20.0586 2.77452L20.0613 2.02452L20.0586 2.77452L13.1941 2.75002L13.1941 2.75002Q12.5762 2.74781 12.0049 2.98326Q11.4336 3.21871 10.9967 3.65564ZM17.6835 8.54962C17.6835 10.0248 16.4877 11.2206 15.0125 11.2206L15.0125 10.4706L15.0125 11.2206C13.5373 11.2206 12.3415 10.0248 12.3415 8.54962L13.0915 8.54962L12.3415 8.54962C12.3415 7.07446 13.5373 5.8786 15.0125 5.8786L15.0125 6.6286L15.0125 5.8786C16.4877 5.8786 17.6835 7.07446 17.6835 8.54962L16.9335 8.54962L17.6835 8.54962ZM16.1835 8.54962L16.1835 8.54962C16.1835 7.90288 15.6592 7.3786 15.0125 7.3786L15.0125 7.3786C14.3658 7.3786 13.8415 7.90288 13.8415 8.54962L13.8415 8.54962C13.8415 9.19636 14.3658 9.72065 15.0125 9.72065L15.0125 9.72065C15.6592 9.72065 16.1835 9.19636 16.1835 8.54962Z"></path></svg>查看JSON文件';
+                        jsonBtn.className = 'download-btn';
+                        jsonBtn.target = '_blank';
+
+                        btnContainer.appendChild(binBtn);
+                        btnContainer.appendChild(mwzBtn);
+                        btnContainer.appendChild(jsonBtn);
+                        details.appendChild(btnContainer);
+
+                        details.appendChild(summary);
+                        detailsContainer.appendChild(details);
+                        break;
+                }
+            };
+
+            eventSource.addEventListener('complete', function (event) {
+                eventSource.close();
+                startBtn.style.display = 'flex';
+                pauseBtn.style.display = 'none';
+                stopBtn.style.display = 'none';
+            });
+
+            eventSource.onerror = function () {
+                eventSource.close();
+                startBtn.style.display = 'flex';
+                pauseBtn.style.display = 'none';
+                stopBtn.style.display = 'none';
+            };
+        }
+
+        function pauseRequest() {
+            const pauseBtn = document.getElementById('pauseBtn');
+            if (eventSource) {
+                if (!isPaused) {
+                    eventSource.close();
+                    isPaused = true;
+                    pauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14" height="14" viewBox="0 0 14 14" fill="none"><path fill="#000000" d="M4.34987 1.44438L11.5964 5.47023C12.7966 6.13698 12.7966 7.86302 11.5964 8.52978L4.34987 12.5556C3.18345 13.2036 1.75 12.3602 1.75 11.0259L1.75 2.97415C1.75 1.6398 3.18345 0.796359 4.34987 1.44438Z"></path></svg>Continue';
+                } else {
+                    const model = document.getElementById('modelSelect').value;
+                    eventSource = new EventSource(`/fetch-data?model=${model}&startId=${currentProgress.completed}&endId=${currentProgress.total}`);
+                    isPaused = false;
+                    pauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.85 1.4L3.15 1.4C2.3768 1.4 1.75 2.0268 1.75 2.8L1.75 11.2C1.75 11.9732 2.3768 12.6 3.15 12.6L3.85 12.6C4.6232 12.6 5.25 11.9732 5.25 11.2L5.25 2.8C5.25 2.0268 4.6232 1.4 3.85 1.4ZM10.85 1.4L10.15 1.4C9.3768 1.4 8.75 2.0268 8.75 2.8L8.75 11.2C8.75 11.9732 9.3768 12.6 10.15 12.6L10.85 12.6C11.6232 12.6 12.25 11.9732 12.25 11.2L12.25 2.8C12.25 2.0268 11.6232 1.4 10.85 1.4Z" fill-rule="evenodd"  fill="#000000" ></path></svg>Pause';
+                }
+            }
+        }
+
+        function stopRequest() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+
+                document.getElementById('startBtn').style.display = 'flex';
+                document.getElementById('pauseBtn').style.display = 'none';
+                document.getElementById('stopBtn').style.display = 'none';
+
+                document.getElementById('progressBar').style.width = '0%';
+                document.getElementById('progressText').textContent = '0%';
+            }
+        }
+
+        function createLogTable() {
+            const table = document.createElement('table');
+            table.id = 'logTable';
+            table.className = 'log-table';
+            document.getElementById('logs').appendChild(table);
+            return table;
+        }
+
+        // 页面加载完成后初始化下拉菜单
+        document.addEventListener('DOMContentLoaded', function () {
+            const startSelect = document.getElementById('idSelectStart');
+            const endSelect = document.getElementById('idSelectEnd');
+            const modelSelect = document.getElementById('modelSelect');
+
+            // 填充起始值下拉框
+            wfIdRanges.forEach(range => {
+                const [start] = range.split('-');
+                const option = document.createElement('option');
+                option.value = range;
+                option.textContent = start;
+                startSelect.appendChild(option);
+            });
+
+            // 当起始值变化时更新结束值选项
+            startSelect.addEventListener('change', function () {
+                const selectedRange = this.value;
+                const [selectedStart] = selectedRange.split('-');
+                const selectedSeries = getSeriesType(selectedStart);
+
+                endSelect.innerHTML = '';
+
+                wfIdRanges.forEach(range => {
+                    const [start, end] = range.split('-');
+                    if (getSeriesType(start) === selectedSeries && range >= selectedRange) {
+                        const option = document.createElement('option');
+                        option.value = range;
+                        option.textContent = end;
+                        endSelect.appendChild(option);
+                    }
+                });
+
+                checkRequestCount();
+            });
+
+            endSelect.addEventListener('change', checkRequestCount);
+
+            // 填充model下拉框
+            modelIds.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                modelSelect.appendChild(option);
+            });
+
+            // 初始化拖拽功能
+            const layoutHeader = document.querySelector('.layout-header');
+            const layout = document.querySelector('.layout');
+            let isResizing = false;
+            let startY;
+            let startHeight;
+
+            layoutHeader.addEventListener('mousedown', function (e) {
+                isResizing = true;
+                startY = e.clientY;
+                startHeight = parseInt(getComputedStyle(layout).height);
+
+                // document.body.style.cursor = 'row-resize';
+                // layoutHeader.style.cursor = 'row-resize';
+            });
+
+            document.addEventListener('mousemove', function (e) {
+                if (!isResizing) return;
+
+                const deltaY = startY - e.clientY;
+                const newHeight = startHeight + deltaY;
+
+                if (newHeight > 100) {
+                    layout.style.height = newHeight + 'px';
+                }
+            });
+
+            document.addEventListener('mouseup', function () {
+                isResizing = false;
+                // document.body.style.cursor = 'default';
+                // layoutHeader.style.cursor = 'default';
+            });
+        });
+
+        function getSeriesType(id) {
+            if (id.startsWith('120917300')) {
+                return 'series1';
+            } else if (id.startsWith('36626')) {
+                return 'series2';
+            } else if (id.startsWith('12091734') || id.startsWith('12091735')) {
+                return 'series3';
+            }
+        }
+
+        function checkRequestCount() {
+            const startRange = document.getElementById('idSelectStart').value;
+            const endRange = document.getElementById('idSelectEnd').value;
+            const [startId] = startRange.split('-');
+            const [, endId] = endRange.split('-');
+
+            const requestCount = Math.floor((parseInt(endId) - parseInt(startId)) / 1000) + 1;
+            const warningBox = document.getElementById('warningBox');
+            const requestCountSpan = document.getElementById('requestCount');
+
+            if (requestCount > 3000) {
+                requestCountSpan.textContent = requestCount;
+                warningBox.style.display = 'block';
+            } else {
+                warningBox.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>
