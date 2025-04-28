@@ -1,10 +1,4 @@
 @echo off
-
-rem 阅前提示:
-rem 这个BAT脚本可维护性较差
-rem 其中大约65%的代码都是为了实现一个屎一样的退出动效
-rem 不想得高血压的话我劝你别继续看下去了(
-
 set "APP_NAME=Xiaomi Watchface Store Pro"
 set "APP_VERSION=V1.0"
 set "APP_AUTHOR=Aurysian-Yan"
@@ -15,13 +9,108 @@ set "NODE_PORT=3000"
 
 title %APP_NAME%
 
+REM 检查必要文件是否存在
+set "MISSING_FILES="
+if not exist "server.js" set "MISSING_FILES=server.js"
+if not exist "public" set "MISSING_FILES=public 文件夹"
+if exist "public" (
+    if not exist "public\index.html" set "MISSING_FILES=public\index.html"
+    if not exist "public\styles" set "MISSING_FILES=public\css 目录"
+    if not exist "public\styles\main.css" set "MISSING_FILES=public\css\main.css"
+    if not exist "public\styles\fonts" set "MISSING_FILES=public\css 目录"
+)
+
+if not "%MISSING_FILES%"=="" (
+    color 0C
+    cls
+    echo ─────────────────────── %APP_NAME% %APP_VERSION% ─────────────────────────
+    echo.
+    echo    初始化时发生错误，请检查文件完整性。
+    echo.
+    echo    缺少必要文件或目录：%MISSING_FILES%
+    echo.
+    echo ─────────────────────────────────────────────────────────────────────────────────
+    echo.
+    echo 请确保已完整解压程序包，或从官方渠道重新下载。
+    echo 访问 github.com/useless-anlong/mi-watchface-store-pro/releases/ 获取完整版本。
+    echo 如果问题仍然存在，请联系开发者。
+    pause
+    exit /b 1
+)
+
+REM 检查Node.js是否安装
 node --version >nul 2>&1
 if %errorlevel% equ 0 (
     for /f "delims=" %%a in ('node --version') do set NODE_VERSION=%%a
 ) else (
-    echo 未检测到 Node.js，请安装 Node.js 后再运行此脚本。
+    color 0C
+    cls
+    echo ─────────────────────── %APP_NAME% %APP_VERSION% ─────────────────────────
+    echo.
+    echo    初始化时发生错误：
+    echo.
+    echo    未检测到 Node.JS，请安装 Node.JS 后再运行此脚本。
+    echo.
+    echo ─────────────────────────────────────────────────────────────────────────────────
+    echo.
+    echo 你可以从 https://nodejs.org/ 下载并安装 Node.js。
     pause
     exit /b 1
+)
+
+REM 检查node_modules是否已安装
+if not exist "node_modules" (
+    :INSTALL_DEPENDENCIES
+    color 0C
+    cls
+    echo ─────────────────────── %APP_NAME% %APP_VERSION% ─────────────────────────
+    echo.
+    echo    初始化时发生错误，请安装必须的依赖包。
+    echo.
+    echo    没有找到 node_modules 目录。
+    echo.
+    echo ─────────────────────────────────────────────────────────────────────────────────
+    echo.
+    echo 你可以手动执行 npm install / yarn install 及其他的包管理器对应命令安装依赖包。
+    echo.
+    choice /c YN /n /m "或者我们可以帮你完成这一步，要继续吗？[Y/N]"
+    if errorlevel 2 (
+        echo 已取消安装。
+        pause
+        exit /b 1
+    )
+    if errorlevel 1 (
+        color 0E
+        echo 正在安装依赖包，请稍候...
+        npm install
+        if %errorlevel% neq 0 (
+                cls
+                echo ─────────────────────── %APP_NAME% %APP_VERSION% ─────────────────────────
+                echo.
+                echo    安装依赖包时发生错误：
+                echo.
+                echo    现在无法顺利连接到 NPM 源，请检查你的网络连接或者修改镜像源。
+                echo.
+                echo ─────────────────────────────────────────────────────────────────────────────────
+                echo.
+                choice /c EF /n /m "你希望退出[E]还是修改镜像源[F]？"
+                if errorlevel 2 (
+                    echo 已取消安装。
+                    pause
+                    exit /b 1
+                )
+                if errorlevel 1 (
+                    echo 正在尝试修改镜像源为淘宝镜像源，请稍候...
+                    start npm config set registry https://registry.npmmirror.com
+                    goto INSTALL_DEPENDENCIES
+                )
+        )
+        color 0A
+        echo 依赖包安装完成，请重新启动批处理。
+        pause
+        cls
+    )
+    goto INSTALL_DEPENDENCIES
 )
 
 color 0E

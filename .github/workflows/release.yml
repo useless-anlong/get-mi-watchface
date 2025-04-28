@@ -19,63 +19,89 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
-      contents: write  # 明确授予写入内容的权限
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # 获取完整历史以便生成更新日志
+          fetch-depth: 0
 
       - name: Generate start.server.bat with dynamic variables
+        shell: powershell
         run: |
           # 获取当前日期时间
-          CURRENT_DATE=$(date '+%Y.%m.%d %H:%M')
+          $CURRENT_DATE = Get-Date -Format "yyyy.MM.dd HH:mm"
           
           # 获取版本号（从输入参数）
-          VERSION=${{ github.event.inputs.version }}
+          $VERSION = "${{ github.event.inputs.version }}"
           
           # 获取当前分支名
-          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          $BRANCH = git rev-parse --abbrev-ref HEAD
           
           # 获取许可证信息（默认为MIT）
-          LICENSE="MIT License"
+          $LICENSE = "MIT License"
           
-          # 读取原始txt文件
-          cat start.server.txt > start.server.bat
+          # 读取原始txt文件内容
+          $content = Get-Content -Path start.server.txt -Raw -Encoding UTF8
           
           # 替换变量
-          sed -i "s/set \"APP_VERSION=.*\"/set \"APP_VERSION=$VERSION\"/" start.server.bat
-          sed -i "s/set \"APP_LICENSE=.*\"/set \"APP_LICENSE=$LICENSE\"/" start.server.bat
-          sed -i "s/Set \"APP_BRANCH=.*\"/Set \"APP_BRANCH=$BRANCH\"/" start.server.bat
-          sed -i "s/Set \"APP_DATE=.*\"/Set \"APP_DATE=$CURRENT_DATE\"/" start.server.bat
+          $content = $content -replace 'set "APP_VERSION=.*"', "set `"APP_VERSION=$VERSION`""
+          $content = $content -replace 'set "APP_LICENSE=.*"', "set `"APP_LICENSE=$LICENSE`""
+          $content = $content -replace 'Set "APP_BRANCH=.*"', "Set `"APP_BRANCH=$BRANCH`""
+          $content = $content -replace 'Set "APP_DATE=.*"', "Set `"APP_DATE=$CURRENT_DATE`""
+          
+          # 写入新文件，确保使用正确的编码和换行符
+          $content | Out-File -FilePath start.server.bat -Encoding ASCII
 
       - name: Generate changelog
         id: changelog
+        shell: powershell
         run: |
           # 获取最近的标签
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          $LATEST_TAG = $(git describe --tags --abbrev=0 2>$null) 
           
-          if [ -z "$LATEST_TAG" ]; then
+          if ([string]::IsNullOrEmpty($LATEST_TAG)) {
             # 如果没有找到标签，获取所有提交
-            CHANGELOG=$(git log --pretty=format:"* %s (%an)" --reverse)
-          else
+            $CHANGELOG = git log --pretty=format:"* %s (%an)" --reverse
+          } else {
             # 获取从最近标签到现在的提交
-            CHANGELOG=$(git log ${LATEST_TAG}..HEAD --pretty=format:"* %s (%an)" --reverse)
-          fi
+            $CHANGELOG = git log ${LATEST_TAG}..HEAD --pretty=format:"* %s (%an)" --reverse
+          }
           
           # 如果没有变更，提供默认消息
-          if [ -z "$CHANGELOG" ]; then
-            CHANGELOG="* 此版本包含一些改进和错误修复"
-          fi
+          if ([string]::IsNullOrEmpty($CHANGELOG)) {
+            $CHANGELOG = "* 此版本包含一些改进和错误修复"
+          }
           
           # 设置输出变量
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGELOG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          $CHANGELOG = $CHANGELOG -replace "`n", "%0A"
+          echo "changelog=$CHANGELOG" >> $env:GITHUB_OUTPUT
 
-      - name: Create Release and Upload Asset
+      - name: Create release package
+        shell: powershell
+        run: |
+          # 清理版本号，移除v前缀（如果有）
+          $VERSION_CLEAN = "${{ github.event.inputs.version }}" -replace '^v', ''
+          
+          # 创建临时目录
+          New-Item -Path release_package -ItemType Directory -Force
+          
+          # 复制所需文件到临时目录
+          Copy-Item -Path public -Destination release_package -Recurse
+          Copy-Item -Path server.js -Destination release_package
+          Copy-Item -Path start.server.bat -Destination release_package
+          
+          # 创建压缩包
+          $ZIP_NAME = "mi-watchface-store-pro_${VERSION_CLEAN}_windows-global.zip"
+          Compress-Archive -Path release_package\* -DestinationPath $ZIP_NAME -Force
+          
+          # 输出压缩包名称供后续步骤使用
+          echo "zip_name=$ZIP_NAME" >> $env:GITHUB_OUTPUT
+        id: package
+
+      - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.event.inputs.version }}
@@ -87,9 +113,10 @@ jobs:
             
             ## 下载
             
-            - start.server.bat: 启动服务器脚本
+            - ${{ steps.package.outputs.zip_name }}: 完整程序包（包含服务器脚本和启动文件）
           draft: false
           prerelease: ${{ github.event.inputs.prerelease }}
-          files: ./start.server.bat
+          files: |
+            ${{ steps.package.outputs.zip_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
