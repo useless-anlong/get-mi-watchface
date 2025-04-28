@@ -70,9 +70,9 @@ jobs:
             $CHANGELOG = git log ${LATEST_TAG}..HEAD --pretty=format:"* %s (%an)" --reverse
           }
           
-          # 如果没有变更，提供默认消息
+          # 如果没有变更，提供默认消息（使用英文避免编码问题）
           if ([string]::IsNullOrEmpty($CHANGELOG)) {
-            $CHANGELOG = "* 此版本包含一些改进和错误修复"
+            $CHANGELOG = "* This version includes some improvements and bug fixes"
           }
           
           # 设置输出变量
