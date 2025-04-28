@@ -59,21 +59,30 @@ jobs:
         id: changelog
         shell: powershell
         run: |
-          # 获取最近的标签
-          $LATEST_TAG = $(git describe --tags --abbrev=0 2>$null) 
+          # 尝试获取最近的标签，但不要在失败时报错
+          $LATEST_TAG = ""
+          try {
+            $LATEST_TAG = $(git describe --tags --abbrev=0 2>$null)
+          } catch {
+            # 忽略错误，保持 $LATEST_TAG 为空
+          }
           
+          # 如果没有找到标签，获取所有提交
           if ([string]::IsNullOrEmpty($LATEST_TAG)) {
-            # 如果没有找到标签，获取所有提交
+            Write-Host "No previous tags found. Getting all commits..."
             $CHANGELOG = git log --pretty=format:"* %s (%an)" --reverse
           } else {
-            # 获取从最近标签到现在的提交
+            Write-Host "Found previous tag: $LATEST_TAG. Getting commits since then..."
             $CHANGELOG = git log ${LATEST_TAG}..HEAD --pretty=format:"* %s (%an)" --reverse
           }
           
-          # 如果没有变更，提供默认消息（使用英文避免编码问题）
+          # 如果没有变更，提供默认消息
           if ([string]::IsNullOrEmpty($CHANGELOG)) {
+            Write-Host "No changes found. Using default message."
             $CHANGELOG = "* This version includes some improvements and bug fixes"
           }
+          
+          Write-Host "Changelog generated successfully."
           
           # 设置输出变量
           $CHANGELOG = $CHANGELOG -replace "`n", "%0A"
