@@ -38,8 +38,8 @@ app.get('/fetch-data', async (req, res) => {
                 status: response.data?.code === 200 ? 'success' : 'notfound',
                 id: id,
                 message: response.data?.code === 200 ?
-                    `<span style="color:rgb(19, 153, 99);">[  OK  ]</span> ID ${id} in ${model} has been added to the list.` :
-                    `<span style="color:rgb(97, 97, 97);">[ NULL ]</span> Could not find watchface for ID ${id} in model ${model}.`
+                    `<span style="color:rgb(19, 153, 99);">[   OK   ]</span> ID ${id} in ${model} has been added to the list.` :
+                    `<span style="color:rgb(97, 97, 97);">[  NULL  ]</span> Could not find watchface for ID ${id} in model ${model}.`
             })}\n\n`);
         } catch (error) {
             res.write(`data: ${JSON.stringify({

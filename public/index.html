@@ -138,24 +138,6 @@
     <script>
         const baseUrl = 'http://localhost:3000/api/watchface/prize/detail?';
 
-        // 在现有 script 标签中添加
-        document.addEventListener('DOMContentLoaded', function () {
-            const tabItems = document.querySelectorAll('.tab-item');
-
-            tabItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    // 移除所有活动状态
-                    tabItems.forEach(tab => tab.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-                    // 添加当前选中项的活动状态
-                    item.classList.add('active');
-                    const tabId = item.dataset.tab;
-                    document.getElementById(tabId).classList.add('active');
-                });
-            });
-        });
-
         const wfIdRanges = [
             // 120917300000-120917300999 series
             "120917300000-120917300999",
@@ -384,7 +366,20 @@
             const idSelectGroup = document.getElementById('idSelectGroup');
             const idInputGroup = document.getElementById('idInputGroup');
             const modeInfomation = document.getElementById('modeInfomation');
+            const tabItems = document.querySelectorAll('.tab-item');
 
+            tabItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // 移除所有活动状态
+                    tabItems.forEach(tab => tab.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                    // 添加当前选中项的活动状态
+                    item.classList.add('active');
+                    const tabId = item.dataset.tab;
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
             // 填充起始值下拉框
             wfIdRanges.forEach(range => {
                 const [start] = range.split('-');
@@ -481,6 +476,99 @@
             // 在起始值和结束值的change事件中添加检查
             startSelect.addEventListener('change', checkRequestCount);
             endSelect.addEventListener('change', checkRequestCount);
+
+            // 定义检查请求数量的函数
+            function checkRequestCount() {
+                // 如果是单个ID搜索，不需要显示警告
+                if (singleIdCheckbox.checked) {
+                    warningBox.style.display = 'none';
+                    return;
+                }
+
+                const startRange = startSelect.value;
+                const endRange = endSelect.value;
+
+                if (!startRange || !endRange) return; // 防止在下拉框未初始化时执行
+
+                const [startId] = startRange.split('-');
+                const [, endId] = endRange.split('-');
+
+                const requestCount = Math.floor((parseInt(endId) - parseInt(startId))) + 1;
+                // const requestCount = Math.floor((parseInt(endId) - parseInt(startId)) / 1000) + 1;
+
+                console.log("检查请求数量:", requestCount); // 添加调试信息
+
+                // 使用 4000 作为阈值
+                if (requestCount >= 4000) {
+                    requestCountSpan.textContent = requestCount;
+                    warningBox.style.display = 'flex';
+                } else {
+                    warningBox.style.display = 'none';
+                }
+            }
+
+            // 当起始值变化时更新结束值选项
+            startSelect.addEventListener('change', function () {
+                const selectedRange = this.value;
+                const [selectedStart] = selectedRange.split('-');
+                const selectedSeries = getSeriesType(selectedStart);
+
+                endSelect.innerHTML = '';
+
+                wfIdRanges.forEach(range => {
+                    const [start, end] = range.split('-');
+                    if (getSeriesType(start) === selectedSeries && range >= selectedRange) {
+                        const option = document.createElement('option');
+                        option.value = range;
+                        option.textContent = end;
+                        endSelect.appendChild(option);
+                    }
+                });
+
+                // 在更新结束值选项后检查请求数量
+                setTimeout(checkRequestCount, 0);
+            });
+
+            // 初始化显示状态 - 默认选中单个表盘搜索
+            startSelect.disabled = true;
+            endSelect.disabled = true;
+            singleIdInput.disabled = false;
+            modeInfomation.textContent = "单项搜索";
+            warningBox.style.display = 'none';
+
+            // 更新显示模式的函数
+            function updateDisplayMode(isSingleMode) {
+                // 更新组的显示状态
+                idSelectGroup.style.display = isSingleMode ? 'none' : 'flex';
+                idInputGroup.style.display = isSingleMode ? 'flex' : 'none';
+
+                // 更新模式信息
+                modeInfomation.textContent = isSingleMode ? "单项搜索" : "范围搜索";
+
+                // 更新输入控件状态
+                singleIdInput.disabled = !isSingleMode;
+                startSelect.disabled = isSingleMode;
+                endSelect.disabled = isSingleMode;
+
+                // 检查请求数量
+                setTimeout(checkRequestCount, 0);
+            }
+
+            // 初始化显示模式
+            updateDisplayMode(true);
+
+            // 添加复选框状态变化的事件监听器
+            singleIdCheckbox.addEventListener('change', function () {
+                updateDisplayMode(this.checked);
+            });
+
+            // 在结束值变化时检查请求数量
+            endSelect.addEventListener('change', checkRequestCount);
+
+            // 触发初始的结束值填充
+            if (startSelect.options.length > 0) {
+                startSelect.dispatchEvent(new Event('change'));
+            }
 
             checkServerStatus();
         });
@@ -601,19 +689,19 @@
 
                         const binBtn = document.createElement('a');
                         binBtn.href = data.data.data.recommend_list[0].config_file;
-                        binBtn.innerHTML = '<span class="icons bin"></span>下载BIN文件';
+                        binBtn.innerHTML = '<span class="icons bin"></span>下载 BIN 文件';
                         binBtn.className = 'download-btn';
                         binBtn.target = '_blank';
 
                         const mwzBtn = document.createElement('a');
                         mwzBtn.href = data.data.data.recommend_list[0].config_file_v2;
-                        mwzBtn.innerHTML = '<span class="icons mwz"></span>下载MWZ文件';
+                        mwzBtn.innerHTML = '<span class="icons mwz"></span>下载 MWZ 文件';
                         mwzBtn.className = 'download-btn';
                         mwzBtn.target = '_blank';
 
                         const jsonBtn = document.createElement('a');
                         jsonBtn.href = `https://watch-appstore.iot.mi.com/api/watchface/prize/detail?model=${document.getElementById('modelSelect').value}&id=${data.id}`;
-                        jsonBtn.innerHTML = '<span class="icons json"></span>查看JSON文件';
+                        jsonBtn.innerHTML = '<span class="icons json"></span>查看 JSON 文件';
                         jsonBtn.className = 'download-btn';
                         jsonBtn.target = '_blank';
 
@@ -698,53 +786,6 @@
             return table;
         }
 
-        // 页面加载完成后初始化下拉菜单
-        // document.addEventListener('DOMContentLoaded', function () {
-        //     const startSelect = document.getElementById('idSelectStart');
-        //     const endSelect = document.getElementById('idSelectEnd');
-        //     const modelSelect = document.getElementById('modelSelect');
-
-        //     // 填充起始值下拉框
-        //     wfIdRanges.forEach(range => {
-        //         const [start] = range.split('-');
-        //         const option = document.createElement('option');
-        //         option.value = range;
-        //         option.textContent = start;
-        //         startSelect.appendChild(option);
-        //     });
-
-        //     // 当起始值变化时更新结束值选项
-        //     startSelect.addEventListener('change', function () {
-        //         const selectedRange = this.value;
-        //         const [selectedStart] = selectedRange.split('-');
-        //         const selectedSeries = getSeriesType(selectedStart);
-
-        //         endSelect.innerHTML = '';
-
-        //         wfIdRanges.forEach(range => {
-        //             const [start, end] = range.split('-');
-        //             if (getSeriesType(start) === selectedSeries && range >= selectedRange) {
-        //                 const option = document.createElement('option');
-        //                 option.value = range;
-        //                 option.textContent = end;
-        //                 endSelect.appendChild(option);
-        //             }
-        //         });
-
-        //         checkRequestCount();
-        //     });
-
-        //     endSelect.addEventListener('change', checkRequestCount);
-
-        //     // 填充model下拉框
-        //     modelIds.forEach(model => {
-        //         const option = document.createElement('option');
-        //         option.value = model;
-        //         option.textContent = model;
-        //         modelSelect.appendChild(option);
-        //     });
-        // });
-
         function getSeriesType(id) {
             if (id.startsWith('120917300')) {
                 return 'series1';
@@ -755,131 +796,6 @@
             }
         }
 
-        // 确保只有一个 DOMContentLoaded 事件处理程序
-        document.addEventListener('DOMContentLoaded', function () {
-            const startSelect = document.getElementById('idSelectStart');
-            const endSelect = document.getElementById('idSelectEnd');
-            const modelSelect = document.getElementById('modelSelect');
-            const warningBox = document.getElementById('warningBox');
-            const requestCountSpan = document.getElementById('requestCount');
-            const singleIdCheckbox = document.getElementById('singleIdCheckbox');
-            const singleIdInput = document.getElementById('singleIdInput');
-            const idSelectGroup = document.getElementById('idSelectGroup');
-            const idInputGroup = document.getElementById('idInputGroup');
-            const modeInfomation = document.getElementById('modeInfomation');
-
-            // 填充起始值下拉框
-            wfIdRanges.forEach(range => {
-                const [start] = range.split('-');
-                const option = document.createElement('option');
-                option.value = range;
-                option.textContent = start;
-                startSelect.appendChild(option);
-            });
-
-            // 填充model下拉框
-            modelIds.forEach(model => {
-                const option = document.createElement('option');
-                option.value = model;
-                option.textContent = model;
-                modelSelect.appendChild(option);
-            });
-
-            // 定义检查请求数量的函数
-            function checkRequestCount() {
-                // 如果是单个ID搜索，不需要显示警告
-                if (singleIdCheckbox.checked) {
-                    warningBox.style.display = 'none';
-                    return;
-                }
-
-                const startRange = startSelect.value;
-                const endRange = endSelect.value;
-
-                if (!startRange || !endRange) return; // 防止在下拉框未初始化时执行
-
-                const [startId] = startRange.split('-');
-                const [, endId] = endRange.split('-');
-
-                const requestCount = Math.floor((parseInt(endId) - parseInt(startId))) + 1;
-                // const requestCount = Math.floor((parseInt(endId) - parseInt(startId)) / 1000) + 1;
-
-                console.log("检查请求数量:", requestCount); // 添加调试信息
-
-                // 使用 4000 作为阈值
-                if (requestCount >= 4000) {
-                    requestCountSpan.textContent = requestCount;
-                    warningBox.style.display = 'flex';
-                } else {
-                    warningBox.style.display = 'none';
-                }
-            }
-
-            // 当起始值变化时更新结束值选项
-            startSelect.addEventListener('change', function () {
-                const selectedRange = this.value;
-                const [selectedStart] = selectedRange.split('-');
-                const selectedSeries = getSeriesType(selectedStart);
-
-                endSelect.innerHTML = '';
-
-                wfIdRanges.forEach(range => {
-                    const [start, end] = range.split('-');
-                    if (getSeriesType(start) === selectedSeries && range >= selectedRange) {
-                        const option = document.createElement('option');
-                        option.value = range;
-                        option.textContent = end;
-                        endSelect.appendChild(option);
-                    }
-                });
-
-                // 在更新结束值选项后检查请求数量
-                setTimeout(checkRequestCount, 0);
-            });
-
-            // 初始化显示状态 - 默认选中单个表盘搜索
-            startSelect.disabled = true;
-            endSelect.disabled = true;
-            singleIdInput.disabled = false;
-            modeInfomation.textContent = "单项搜索";
-            warningBox.style.display = 'none';
-
-            // 更新显示模式的函数
-            function updateDisplayMode(isSingleMode) {
-                // 更新组的显示状态
-                idSelectGroup.style.display = isSingleMode ? 'none' : 'flex';
-                idInputGroup.style.display = isSingleMode ? 'flex' : 'none';
-
-                // 更新模式信息
-                modeInfomation.textContent = isSingleMode ? "单项搜索" : "范围搜索";
-
-                // 更新输入控件状态
-                singleIdInput.disabled = !isSingleMode;
-                startSelect.disabled = isSingleMode;
-                endSelect.disabled = isSingleMode;
-
-                // 检查请求数量
-                setTimeout(checkRequestCount, 0);
-            }
-
-            // 初始化显示模式
-            updateDisplayMode(true);
-
-            // 添加复选框状态变化的事件监听器
-            singleIdCheckbox.addEventListener('change', function () {
-                updateDisplayMode(this.checked);
-            });
-
-            // 在结束值变化时检查请求数量
-            endSelect.addEventListener('change', checkRequestCount);
-
-            // 触发初始的结束值填充
-            if (startSelect.options.length > 0) {
-                startSelect.dispatchEvent(new Event('change'));
-            }
-        });
-
-        
         // 带动画的模态框关闭函数
         function closeModalWithAnimation(modal) {
             modal.classList.add('hide');
