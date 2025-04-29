@@ -4,83 +4,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>获取并展示JSON数据</title>
-    <link rel="preconnect" href="https://rsms.me/">
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <title>Get Xiaomi Watchface</title>
+    <link rel="icon" href="favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="./styles/main.css">
 </head>
 
-<body>
-    <div class="progress-bar" id="progressBar" style="width: 0vw;"></div>
-    <div id="console">
-        <div class="fetch-console-container">
-            <h1>Params</h1>
-            <table class="settings-table">
-                <thead>
-                    <tr>
-                        <th>Key</th>
-                        <th>Value</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>id-start</td>
-                        <td><select id="idSelectStart"></select></td>
-                        <td>选择起始ID范围</td>
-                    </tr>
-                    <tr>
-                        <td>id-end</td>
-                        <td><select id="idSelectEnd"></select></td>
-                        <td>选择结束ID范围</td>
-                    </tr>
-                    <tr>
-                        <td>model</td>
-                        <td><select id="modelSelect"></select></td>
-                        <td>选择设备型号</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div id="warningBox" style="display: none; color: #ff4d4f; margin: 10px 0;">
-            当前请求的表盘数量为<span id="requestCount"></span>，请求时间可能较长。
-        </div>
-        <div id="progress-container">
-            <div class="progress-text" id="progressText">Waiting to launch Params...</div>
-            <div class="button-group">
-                <button onclick="fetchData()" id="startBtn">
-                    Launch
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18"
-                        height="18" viewBox="0 0 14 14" fill="none">
-                        <path fill-rule="evenodd" fill="#CCCCCC"
-                            d="M12.2107 6.36029L2.54449 2.0642C1.9818 1.81411 1.39362 2.36004 1.60114 2.93977L2.79036 6.26205C2.85471 6.44182 3.05886 6.56252 3.24981 6.56246C3.24986 6.56246 3.24991 6.56246 3.24996 6.56246L6.64996 6.56246C6.67868 6.56246 6.70713 6.56526 6.73531 6.57087C6.76348 6.57647 6.79084 6.58477 6.81738 6.59576C6.84392 6.60675 6.86913 6.62023 6.89302 6.63619C6.9169 6.65215 6.939 6.67029 6.95932 6.6906C6.97963 6.71091 6.99777 6.73301 7.01373 6.7569C7.02969 6.78079 7.04316 6.806 7.05416 6.83254C7.06515 6.85908 7.07345 6.88644 7.07905 6.91461C7.08465 6.94278 7.08746 6.97123 7.08746 6.99996C7.08746 7.02869 7.08465 7.05714 7.07905 7.08531C7.07345 7.11348 7.06515 7.14084 7.05416 7.16738C7.04316 7.19392 7.02969 7.21913 7.01373 7.24302C6.99777 7.26691 6.97963 7.28901 6.95932 7.30932C6.939 7.32963 6.9169 7.34777 6.89302 7.36373C6.86913 7.37969 6.84392 7.39317 6.81738 7.40416C6.79084 7.41515 6.76348 7.42345 6.73531 7.42905C6.70713 7.43466 6.67868 7.43746 6.64996 7.43746L3.24996 7.43746C3.24996 7.43746 3.24996 7.43746 3.24996 7.43746C3.05901 7.43746 2.85471 7.5581 2.79036 7.73787L1.60114 11.0602C1.39362 11.6399 1.9818 12.1858 2.54449 11.9357L12.2107 7.63963C12.765 7.39328 12.765 6.60663 12.2107 6.36029Z">
-                        </path>
-                    </svg>
-                </button>
-                <button onclick="pauseRequest()" id="pauseBtn" style="display:none">
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14"
-                        height="14" viewBox="0 0 14 14" fill="none">
-                        <path
-                            d="M3.85 1.4L3.15 1.4C2.3768 1.4 1.75 2.0268 1.75 2.8L1.75 11.2C1.75 11.9732 2.3768 12.6 3.15 12.6L3.85 12.6C4.6232 12.6 5.25 11.9732 5.25 11.2L5.25 2.8C5.25 2.0268 4.6232 1.4 3.85 1.4ZM10.85 1.4L10.15 1.4C9.3768 1.4 8.75 2.0268 8.75 2.8L8.75 11.2C8.75 11.9732 9.3768 12.6 10.15 12.6L10.85 12.6C11.6232 12.6 12.25 11.9732 12.25 11.2L12.25 2.8C12.25 2.0268 11.6232 1.4 10.85 1.4Z"
-                            fill-rule="evenodd" fill="#000000">
-                        </path>
-                    </svg>
-                    Pause
-                </button>
-                <button onclick="stopRequest()" id="stopBtn" style="display:none">
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14"
-                        height="14" viewBox="0 0 14 14" fill="none">
-                        <rect x="1.4000015258789062" y="1.3999996185302734" width="11.200000762939453"
-                            height="11.200000762939453" rx="2.0999999999999996" fill="#000000">
-                        </rect>
-                    </svg>
-                    Stop
-                </button>
+<body style="justify-content: center;">
+    <div class="progress-bar" id="progressBar" style="width: 0vw; display: none;"></div>
+    <div id="details-container" class="details-container"></div>
+    <div class="console-container">
+        <div id="console">
+            <div class="fetch-console-container">
+                <input type="checkbox" id="singleIdCheckbox" checked>
+                <label for="singleIdCheckbox" id="modeInfomation">单项搜索</label>
+                <div class="input-group" id="idSelectGroup">
+                    <p>遍历所有 ID 为从</p>
+                    <select id="idSelectStart" class="select" disabled></select>
+                    <p>至</p>
+                    <select id="idSelectEnd" class="select" disabled></select>
+                </div>
+                <div class="input-group" id="idInputGroup">
+                    <p>在小米服务器随机查找 ID 为</p>
+                    <input type="number" id="singleIdInput" placeholder="表盘ID">
+                </div>
+                <p>的表盘</p>
+            </div>
+            <div id="launcher">
+                <div class="input-group">
+                    <p>表盘所属机型</p>
+                    <select id="modelSelect" class="select"></select>
+                </div>
+            </div>
+            <div id="logs">
+                <table id="logTable" class="log-table">
+                    <tbody>
+                        <tr>
+                            <td class="log-notfound"><span style="color:rgb(97, 97, 97);">[SERVER] Waiting for start
+                                    search...</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="progress-container">
+                <div class="button-group" style="align-items: center; font-family: 'JetBrainsMapleMono'; gap: 8px;">
+                    <span id="menu" class="menu-dropdown">
+                        <span onclick="clearLogs()" id="clearBtn" class="appMenuButton">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 1.75a3.25 3.25 0 0 1 3.245 3.066L15.25 5h5.25a.75.75 0 0 1 .102 1.493L20.5 6.5h-.796l-1.28 13.02a2.75 2.75 0 0 1-2.561 2.474l-.176.006H8.313a2.75 2.75 0 0 1-2.714-2.307l-.023-.174L4.295 6.5H3.5a.75.75 0 0 1-.743-.648L2.75 5.75a.75.75 0 0 1 .648-.743L3.5 5h5.25A3.25 3.25 0 0 1 12 1.75Zm6.197 4.75H5.802l1.267 12.872a1.25 1.25 0 0 0 1.117 1.122l.127.006h7.374c.6 0 1.109-.425 1.225-1.002l.02-.126L18.196 6.5ZM13.75 9.25a.75.75 0 0 1 .743.648L14.5 10v7a.75.75 0 0 1-1.493.102L13 17v-7a.75.75 0 0 1 .75-.75Zm-3.5 0a.75.75 0 0 1 .743.648L11 10v7a.75.75 0 0 1-1.493.102L9.5 17v-7a.75.75 0 0 1 .75-.75Zm1.75-6a1.75 1.75 0 0 0-1.744 1.606L10.25 5h3.5A1.75 1.75 0 0 0 12 3.25Z"
+                                    fill="currentColor" />
+                            </svg>
+                            清理日志
+                        </span>
+                        <span onclick="showAboutInfo()" id="aboutBtn" class="appMenuButton">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 1.999c5.524 0 10.002 4.478 10.002 10.002 0 5.523-4.478 10.001-10.002 10.001-5.524 0-10.002-4.478-10.002-10.001C1.998 6.477 6.476 1.999 12 1.999Zm0 1.5a8.502 8.502 0 1 0 0 17.003A8.502 8.502 0 0 0 12 3.5Zm-.004 7a.75.75 0 0 1 .744.648l.007.102.003 5.502a.75.75 0 0 1-1.493.102l-.007-.101-.003-5.502a.75.75 0 0 1 .75-.75ZM12 7.003a.999.999 0 1 1 0 1.997.999.999 0 0 1 0-1.997Z"
+                                    fill="currentColor" />
+                            </svg>
+                            关于
+                        </span>
+                        <span onclick="showCopyrightInfo()" id="copyrightBtn" class="appMenuButton">
+                            <svg width="16" height="16" viewBox="0 0 18 18" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M9 1.5C13.1422 1.5 16.5 4.85775 16.5 9C16.5 13.1422 13.1422 16.5 9 16.5C4.85775 16.5 1.5 13.1422 1.5 9C1.5 4.85775 4.85775 1.5 9 1.5ZM9 2.625C7.30924 2.625 5.68773 3.29664 4.49219 4.49219C3.29664 5.68773 2.625 7.30924 2.625 9C2.625 10.6908 3.29664 12.3123 4.49219 13.5078C5.68773 14.7034 7.30924 15.375 9 15.375C10.6908 15.375 12.3123 14.7034 13.5078 13.5078C14.7034 12.3123 15.375 10.6908 15.375 9C15.375 7.30924 14.7034 5.68773 13.5078 4.49219C12.3123 3.29664 10.6908 2.625 9 2.625ZM9.06641 4.76953C10.1136 4.7696 11.073 5.15268 11.8105 5.78418L11.9551 5.91309L12.0312 6.00098C12.1836 6.21737 12.1686 6.51819 11.9805 6.71875C11.792 6.91941 11.4923 6.95326 11.2666 6.81445L11.1748 6.74414L10.959 6.55957C10.4366 6.1523 9.7799 5.91022 9.06641 5.91016C7.36512 5.9103 5.98569 7.28998 5.98535 8.99219C5.98553 10.6945 7.36502 12.075 9.06641 12.0752C9.8822 12.0751 10.6232 11.7583 11.1748 11.2402L11.2666 11.1699C11.4922 11.0311 11.7919 11.0652 11.9805 11.2656C12.1956 11.4951 12.1844 11.8559 11.9551 12.0713L11.8105 12.2012C11.073 12.8327 10.1136 13.2148 9.06641 13.2148C6.73508 13.2147 4.84491 11.3238 4.84473 8.99219C4.84506 6.66071 6.73518 4.76968 9.06641 4.76953Z"
+                                    fill="currentColor" />
+                            </svg>
+                            版权警示
+                        </span>
+                        <span onclick="openGithub()" id="openGithubBtn" class="appMenuButton">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="m8.066 18.943 6.5-14.5a.75.75 0 0 1 1.404.518l-.036.096-6.5 14.5a.75.75 0 0 1-1.404-.518l.036-.096 6.5-14.5-6.5 14.5ZM2.22 11.47l4.25-4.25a.75.75 0 0 1 1.133.976l-.073.085L3.81 12l3.72 3.719a.75.75 0 0 1-.976 1.133l-.084-.073-4.25-4.25a.75.75 0 0 1-.073-.976l.073-.084 4.25-4.25-4.25 4.25Zm14.25-4.25a.75.75 0 0 1 .976-.073l.084.073 4.25 4.25a.75.75 0 0 1 .073.976l-.073.085-4.25 4.25a.75.75 0 0 1-1.133-.977l.073-.084L20.19 12l-3.72-3.72a.75.75 0 0 1 0-1.06Z"
+                                    fill="currentColor" />
+                            </svg>
+                            查看源代码
+                        </span>
+                    </span>
+                    <span onclick="showMenu()" id="aboutBtn" class="appButton" style="margin-right: 8px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M11.75 3a.75.75 0 0 1 .743.648l.007.102.001 7.25h7.253a.75.75 0 0 1 .102 1.493l-.102.007h-7.253l.002 7.25a.75.75 0 0 1-1.493.101l-.007-.102-.002-7.249H3.752a.75.75 0 0 1-.102-1.493L3.752 11h7.25L11 3.75a.75.75 0 0 1 .75-.75Z"
+                                fill="currentColor" />
+                        </svg>
+                        更多
+                    </span>
+                    <span id="loadAnimate"></span>
+                    <div class="progress-text" id="progressText"></div>
+                </div>
+                <div class="button-group">
+                    <button onclick="fetchData()" id="startBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18"
+                            height="18" viewBox="0 0 14 14" fill="none">
+                            <path fill-rule="evenodd" fill="#CCCCCC"
+                                d="M12.2107 6.36029L2.54449 2.0642C1.9818 1.81411 1.39362 2.36004 1.60114 2.93977L2.79036 6.26205C2.85471 6.44182 3.05886 6.56252 3.24981 6.56246C3.24986 6.56246 3.24991 6.56246 3.24996 6.56246L6.64996 6.56246C6.67868 6.56246 6.70713 6.56526 6.73531 6.57087C6.76348 6.57647 6.79084 6.58477 6.81738 6.59576C6.84392 6.60675 6.86913 6.62023 6.89302 6.63619C6.9169 6.65215 6.939 6.67029 6.95932 6.6906C6.97963 6.71091 6.99777 6.73301 7.01373 6.7569C7.02969 6.78079 7.04316 6.806 7.05416 6.83254C7.06515 6.85908 7.07345 6.88644 7.07905 6.91461C7.08465 6.94278 7.08746 6.97123 7.08746 6.99996C7.08746 7.02869 7.08465 7.05714 7.07905 7.08531C7.07345 7.11348 7.06515 7.14084 7.05416 7.16738C7.04316 7.19392 7.02969 7.21913 7.01373 7.24302C6.99777 7.26691 6.97963 7.28901 6.95932 7.30932C6.939 7.32963 6.9169 7.34777 6.89302 7.36373C6.86913 7.37969 6.84392 7.39317 6.81738 7.40416C6.79084 7.41515 6.76348 7.42345 6.73531 7.42905C6.70713 7.43466 6.67868 7.43746 6.64996 7.43746L3.24996 7.43746C3.24996 7.43746 3.24996 7.43746 3.24996 7.43746C3.05901 7.43746 2.85471 7.5581 2.79036 7.73787L1.60114 11.0602C1.39362 11.6399 1.9818 12.1858 2.54449 11.9357L12.2107 7.63963C12.765 7.39328 12.765 6.60663 12.2107 6.36029Z">
+                            </path>
+                        </svg>
+                    </button>
+                    <button onclick="pauseRequest()" id="pauseBtn" style="display:none">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14"
+                            height="14" viewBox="0 0 14 14" fill="none">
+                            <path
+                                d="M3.85 1.4L3.15 1.4C2.3768 1.4 1.75 2.0268 1.75 2.8L1.75 11.2C1.75 11.9732 2.3768 12.6 3.15 12.6L3.85 12.6C4.6232 12.6 5.25 11.9732 5.25 11.2L5.25 2.8C5.25 2.0268 4.6232 1.4 3.85 1.4ZM10.85 1.4L10.15 1.4C9.3768 1.4 8.75 2.0268 8.75 2.8L8.75 11.2C8.75 11.9732 9.3768 12.6 10.15 12.6L10.85 12.6C11.6232 12.6 12.25 11.9732 12.25 11.2L12.25 2.8C12.25 2.0268 11.6232 1.4 10.85 1.4Z"
+                                fill-rule="evenodd" fill="#000000">
+                            </path>
+                        </svg>
+                    </button>
+                    <button onclick="stopRequest()" id="stopBtn" style="display:none">
+                        取消
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14"
+                            height="14" viewBox="0 0 14 14" fill="none">
+                            <rect x="1.4000015258789062" y="1.3999996185302734" width="11.200000762939453"
+                                height="11.200000762939453" rx="2.0999999999999996" fill="#000000">
+                            </rect>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
-        <div id="logs"></div>
+        <div id="warningBox" style="display: none;">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M10.91 2.782a2.25 2.25 0 0 1 2.975.74l.083.138 7.759 14.009a2.25 2.25 0 0 1-1.814 3.334l-.154.006H4.243a2.25 2.25 0 0 1-2.041-3.197l.072-.143L10.031 3.66a2.25 2.25 0 0 1 .878-.878Zm9.505 15.613-7.76-14.008a.75.75 0 0 0-1.254-.088l-.057.088-7.757 14.008a.75.75 0 0 0 .561 1.108l.095.006h15.516a.75.75 0 0 0 .696-1.028l-.04-.086-7.76-14.008 7.76 14.008ZM12 16.002a.999.999 0 1 1 0 1.997.999.999 0 0 1 0-1.997ZM11.995 8.5a.75.75 0 0 1 .744.647l.007.102.004 4.502a.75.75 0 0 1-1.494.103l-.006-.102-.004-4.502a.75.75 0 0 1 .75-.75Z"
+                    fill="#c3494a" />
+            </svg>
+            <p>当前设置的需要搜索的表盘 ID 数量为 <span id="requestCount"></span>，请求时间可能较长，并可能占用过多不必要的系统资源。建议您适当降低一下请求数量。</p>
+        </div>
     </div>
-    <div id="details-container" class="details-container"></div>
     <script>
         const baseUrl = 'http://localhost:3000/api/watchface/prize/detail?';
 
@@ -159,6 +213,165 @@
             "miwear.watch.o66cn"
         ];
 
+        let serverStatusChecker = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5; // 最大重试次数
+
+        // 检查服务器状态的函数
+        function startServerStatusCheck() {
+            // 如果已经有一个检查器在运行，先停止它
+            if (serverStatusChecker) {
+                serverStatusChecker.close();
+            }
+
+            // 创建一个专门用于检查服务器状态的EventSource
+            serverStatusChecker = new EventSource('/server-status');
+
+            // 当连接成功时重置重试计数
+            serverStatusChecker.onopen = function () {
+                reconnectAttempts = 0;
+                hideServerOfflineNotification();
+            };
+
+            // 当连接关闭时（可能是服务器停止）
+            serverStatusChecker.onerror = function () {
+                serverStatusChecker.close();
+                serverStatusChecker = null;
+
+                // 服务器可能已经断开，开始检查
+                checkServerStatus();
+            };
+        }
+
+        // 检查服务器状态
+        function checkServerStatus() {
+            fetch('/ping')
+                .then(response => {
+                    if (response.ok) {
+                        // 服务器在线，开始持续监控
+                        reconnectAttempts = 0; // 重置计数
+                        startServerStatusCheck();
+                        // 如果之前显示了离线通知，现在可以隐藏
+                        hideServerOfflineNotification();
+                    }
+                })
+                .catch(() => {
+                    // 服务器离线，增加重试计数
+                    reconnectAttempts++;
+
+                    // 显示通知，包含当前尝试次数
+                    showServerOfflineNotification(reconnectAttempts, maxReconnectAttempts);
+
+                    // 如果超过最大重试次数，提示用户并准备关闭页面
+                    if (reconnectAttempts >= maxReconnectAttempts) {
+                        showFinalWarning();
+                    } else {
+                        // 继续尝试重新连接
+                        setTimeout(checkServerStatus, 5000);
+                    }
+                });
+        }
+
+        // 显示服务器离线通知
+        function showServerOfflineNotification() {
+            // 检查是否已经显示了通知
+            if (document.getElementById('server-offline-notification')) {
+                return;
+            }
+
+            const notification = document.createElement('div');
+            notification.id = 'server-offline-notification';
+            notification.className = 'server-offline-notification';
+            notification.innerHTML = `
+        <div class="notification-content">
+            
+            <span>与后端服务的连接已断开</span>
+        </div>
+    `;
+
+            document.body.appendChild(notification);
+
+            // 禁用开始按钮
+            const startBtn = document.getElementById('startBtn');
+            if (startBtn) {
+                startBtn.disabled = true;
+            }
+        }
+
+        // 显示最终警告并准备关闭页面
+        function showFinalWarning() {
+            const finalWarning = document.createElement('div');
+            finalWarning.id = 'final-warning-notification';
+            finalWarning.className = 'server-offline-notification final-warning';
+            finalWarning.innerHTML = `
+        <div class="notification-content">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2c5.523 0 10 4.478 10 10s-4.477 10-10 10S2 17.522 2 12 6.477 2 12 2Zm0 1.667c-4.595 0-8.333 3.738-8.333 8.333 0 4.595 3.738 8.333 8.333 8.333 4.595 0 8.333-3.738 8.333-8.333 0-4.595-3.738-8.333-8.333-8.333Zm-.001 10.835a.999.999 0 1 1 0 1.998.999.999 0 0 1 0-1.998ZM11.994 7a.75.75 0 0 1 .744.648l.007.101.004 4.502a.75.75 0 0 1-1.493.103l-.007-.102-.004-4.501a.75.75 0 0 1 .75-.751Z" fill="currentColor"/></svg>
+            <span>与后端服务的连接已断开且多次重连失败。页面将在10秒后关闭</span>
+        </div>
+        <div class="notification-actions">
+            <button id="stay-button">继续等待</button>
+        </div>
+    `;
+
+            document.body.appendChild(finalWarning);
+
+            // 添加按钮事件
+            document.getElementById('stay-button').addEventListener('click', function () {
+                document.getElementById('final-warning-notification').remove();
+                reconnectAttempts = 0; // 重置计数
+                checkServerStatus(); // 重新开始检查
+            });
+
+            // 10秒后自动关闭页面
+            setTimeout(() => {
+                window.close(); // 尝试关闭窗口
+                // 如果window.close()不起作用（大多数浏览器会阻止脚本关闭非脚本打开的窗口）
+                // 则重定向到空白页
+                window.location.href = 'about:blank';
+            }, 10000);
+        }
+
+        // 隐藏服务器离线通知
+        function hideServerOfflineNotification() {
+            const notification = document.getElementById('server-offline-notification');
+            if (notification) {
+                notification.remove();
+            }
+
+            // 启用开始按钮
+            const startBtn = document.getElementById('startBtn');
+            if (startBtn) {
+                startBtn.disabled = false;
+            }
+        }
+
+        // 显示服务器离线通知
+        function showServerOfflineNotification(attempts, maxAttempts) {
+            // 移除现有通知
+            const existingNotification = document.getElementById('server-offline-notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.id = 'server-offline-notification';
+            notification.className = 'server-offline-notification';
+            notification.innerHTML = `
+        <div class="notification-content">
+             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2c5.523 0 10 4.478 10 10s-4.477 10-10 10S2 17.522 2 12 6.477 2 12 2Zm0 1.667c-4.595 0-8.333 3.738-8.333 8.333 0 4.595 3.738 8.333 8.333 8.333 4.595 0 8.333-3.738 8.333-8.333 0-4.595-3.738-8.333-8.333-8.333Zm-.001 10.835a.999.999 0 1 1 0 1.998.999.999 0 0 1 0-1.998ZM11.994 7a.75.75 0 0 1 .744.648l.007.101.004 4.502a.75.75 0 0 1-1.493.103l-.007-.102-.004-4.501a.75.75 0 0 1 .75-.751Z" fill="currentColor"/></svg>
+            <span>与后端服务的连接已断开，正在尝试重连 (${attempts}/${maxAttempts})</span>
+        </div>
+    `;
+
+            document.body.appendChild(notification);
+
+            // 禁用开始按钮
+            const startBtn = document.getElementById('startBtn');
+            if (startBtn) {
+                startBtn.disabled = true;
+            }
+        }
+
         // 页面加载完成后初始化下拉菜单
         document.addEventListener('DOMContentLoaded', function () {
             const startSelect = document.getElementById('idSelectStart');
@@ -166,6 +379,11 @@
             const modelSelect = document.getElementById('modelSelect');
             const warningBox = document.getElementById('warningBox');
             const requestCountSpan = document.getElementById('requestCount');
+            const singleIdCheckbox = document.getElementById('singleIdCheckbox');
+            const singleIdInput = document.getElementById('singleIdInput');
+            const idSelectGroup = document.getElementById('idSelectGroup');
+            const idInputGroup = document.getElementById('idInputGroup');
+            const modeInfomation = document.getElementById('modeInfomation');
 
             // 填充起始值下拉框
             wfIdRanges.forEach(range => {
@@ -187,24 +405,35 @@
             }
 
             // 当起始值变化时更新结束值选项
-            startSelect.addEventListener('change', function () {
-                const selectedRange = this.value;
-                const [selectedStart] = selectedRange.split('-');
-                const selectedSeries = getSeriesType(selectedStart);
+            startSelect.disabled = true;
+            endSelect.disabled = true;
+            singleIdInput.disabled = false;
+            modeInfomation.textContent = "单项搜索";
+            warningBox.style.display = 'none';
 
-                endSelect.innerHTML = ''; // 清空现有选项
+            // 初始化显示状态 - 默认选中单个表盘搜索
+            updateDisplayMode(true);
 
-                // 只添加同系列且大于等于当前选择区间的结束值选项
-                wfIdRanges.forEach(range => {
-                    const [start, end] = range.split('-');
-                    if (getSeriesType(start) === selectedSeries && range >= selectedRange) {
-                        const option = document.createElement('option');
-                        option.value = range;
-                        option.textContent = end;
-                        endSelect.appendChild(option);
-                    }
-                });
+            // 添加复选框状态变化的事件监听器
+            singleIdCheckbox.addEventListener('change', function () {
+                updateDisplayMode(this.checked);
+                checkRequestCount(); // 添加这一行，确保在切换模式时检查请求数量
             });
+
+            // 更新显示模式的函数
+            function updateDisplayMode(isSingleMode) {
+                // 更新组的显示状态
+                idSelectGroup.style.display = isSingleMode ? 'none' : 'flex';
+                idInputGroup.style.display = isSingleMode ? 'flex' : 'none';
+
+                // 更新模式信息
+                modeInfomation.textContent = isSingleMode ? "单项搜索" : "范围搜索";
+
+                // 更新输入控件状态
+                singleIdInput.disabled = !isSingleMode;
+                startSelect.disabled = isSingleMode;
+                endSelect.disabled = isSingleMode;
+            }
 
             // 触发初始的结束值填充
             startSelect.dispatchEvent(new Event('change'));
@@ -228,15 +457,32 @@
 
                 if (requestCount >= 2000) {
                     requestCountSpan.textContent = requestCount;
-                    warningBox.style.display = 'block';
+                    warningBox.style.display = 'flex';
                 } else {
                     warningBox.style.display = 'none';
                 }
             }
 
+            singleIdCheckbox.addEventListener('change', function () {
+                // 当复选框被勾选时，启用输入框，禁用下拉菜单
+                singleIdInput.disabled = !this.checked;
+                startSelect.disabled = this.checked;
+                endSelect.disabled = this.checked;
+
+                // 如果勾选了单个ID搜索，隐藏警告框
+                if (this.checked) {
+                    warningBox.style.display = 'none';
+                } else {
+                    // 重新检查请求数量
+                    checkRequestCount();
+                }
+            });
+
             // 在起始值和结束值的change事件中添加检查
             startSelect.addEventListener('change', checkRequestCount);
             endSelect.addEventListener('change', checkRequestCount);
+
+            checkServerStatus();
         });
 
         let eventSource = null;
@@ -247,12 +493,28 @@
         };
 
         async function fetchData() {
-            const startRange = document.getElementById('idSelectStart').value;
-            const endRange = document.getElementById('idSelectEnd').value;
+            const singleIdCheckbox = document.getElementById('singleIdCheckbox');
+            const singleIdInput = document.getElementById('singleIdInput');
             const model = document.getElementById('modelSelect').value;
 
-            const [start] = startRange.split('-');
-            const [, end] = endRange.split('-');
+            let start, end;
+
+            if (singleIdCheckbox.checked) {
+                // 单个ID搜索
+                const singleId = singleIdInput.value.trim();
+                if (!singleId) {
+                    alert('请输入表盘 ID 再发起搜索，或是切换至范围搜索模式。');
+                    return;
+                }
+                start = singleId;
+                end = singleId;
+            } else {
+                // 范围搜索
+                const startRange = document.getElementById('idSelectStart').value;
+                const endRange = document.getElementById('idSelectEnd').value;
+                [start] = startRange.split('-');
+                [, end] = endRange.split('-');
+            }
 
             const startBtn = document.getElementById('startBtn');
             const pauseBtn = document.getElementById('pauseBtn');
@@ -262,28 +524,34 @@
             const progressText = document.getElementById('progressText');
             const logsDiv = document.getElementById('logs');
             const detailsContainer = document.getElementById('details-container');
+            const loadAnimate = document.getElementById('loadAnimate');
+
+            loadAnimate.classList.remove('unactive');
+            loadAnimate.classList.remove('done');
+            loadAnimate.classList.add('active');
 
             startBtn.style.display = 'none';
             pauseBtn.style.display = 'flex';
             stopBtn.style.display = 'flex';
 
             // resultDiv.innerHTML = '';
-            logsDiv.innerHTML = '';
+            logsDiv.innerHTML = '<table id="logTable" class="log-table"><tbody><tr><td class="log-notfound"><span style="color:rgb(97, 97, 97);">[SERVER] Waiting for start search...</span></td></tr></tbody></table>';
             detailsContainer.innerHTML = '';
             progressBar.style.width = '0%';
-            progressText.textContent = 'Waiting to launch Params...';
+            progressBar.style.height = '4px';
+            // progressBar.style.margin = '4px';
+            progressText.textContent = '';
 
             eventSource = new EventSource(`/fetch-data?model=${model}&startId=${start}&endId=${end}`);
 
             eventSource.onmessage = function (event) {
                 const data = JSON.parse(event.data);
-
                 switch (data.type) {
                     case 'progress':
                         currentProgress.completed = data.completed;
                         currentProgress.total = data.total;
-                        progressBar.style.width = `${data.progress}%`;
-                        progressText.textContent = `${Math.round(data.progress)}% (${data.completed}/${data.total})`;
+                        progressBar.style.width = `calc(${data.progress}vw - (4px * 2))`;
+                        progressText.innerHTML = `${Math.round(data.progress)}%<span>${data.completed}/${data.total}</span>`;
                         break;
 
                     case 'log':
@@ -333,19 +601,19 @@
 
                         const binBtn = document.createElement('a');
                         binBtn.href = data.data.data.recommend_list[0].config_file;
-                        binBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" viewBox="0 0 24 24" fill="none"><path stroke="rgba(26, 12, 33, 1)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"  d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM15 12.4444L12 16M12 16L9 12.4444M12 16L12 8"></path></svg>下载BIN文件';
+                        binBtn.innerHTML = '<span class="icons bin"></span>下载BIN文件';
                         binBtn.className = 'download-btn';
                         binBtn.target = '_blank';
 
                         const mwzBtn = document.createElement('a');
                         mwzBtn.href = data.data.data.recommend_list[0].config_file_v2;
-                        mwzBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" viewBox="0 0 24 24" fill="none"><path stroke="rgba(26, 12, 33, 1)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"  d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM15 12.4444L12 16M12 16L9 12.4444M12 16L12 8"></path></svg>下载MWZ文件';
+                        mwzBtn.innerHTML = '<span class="icons mwz"></span>下载MWZ文件';
                         mwzBtn.className = 'download-btn';
                         mwzBtn.target = '_blank';
 
                         const jsonBtn = document.createElement('a');
                         jsonBtn.href = `https://watch-appstore.iot.mi.com/api/watchface/prize/detail?model=${document.getElementById('modelSelect').value}&id=${data.id}`;
-                        jsonBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" viewBox="0 0 24 24" fill="none"><path fill="rgba(26, 12, 33, 1)"  d="M9.93604 2.59498M9.93604 2.59498Q10.5849 1.94609 11.4334 1.59642Q12.2818 1.24675 13.1995 1.25003L13.1968 2.00002L13.1995 1.25003L20.064 1.27453L20.064 1.27453L20.064 1.27453Q20.6043 1.27646 21.0985 1.4865Q21.5755 1.68919 21.9432 2.05684Q22.3108 2.42447 22.5135 2.90147Q22.7235 3.39573 22.7255 3.936L22.7255 3.936L22.75 10.8005L22.75 10.8005L22.75 10.8005Q22.7532 11.7182 22.4036 12.5666Q22.0539 13.4151 21.405 14.064L20.8747 13.5336L21.405 14.064L14.064 21.405L14.064 21.405L14.064 21.405Q13.4037 22.0653 12.5445 22.4137Q11.7152 22.75 10.8169 22.75Q9.9186 22.75 9.08928 22.4137Q8.23009 22.0653 7.56983 21.405L7.56983 21.405L2.59498 16.4302L3.12531 15.8998L2.59498 16.4302C0.801672 14.6369 0.801675 11.7293 2.59498 9.93604L3.12531 10.4664L2.59498 9.93604L9.93604 2.59498L10.4664 3.12531L9.93604 2.59498ZM10.9967 3.65564L10.9967 3.65564L3.65564 10.9967L3.65564 10.9967C2.44812 12.2042 2.44812 14.162 3.65564 15.3695L3.65564 15.3695L8.63049 20.3444L8.10015 20.8747L8.63048 20.3444Q9.07566 20.7895 9.65297 21.0236Q10.2112 21.25 10.8169 21.25Q11.4226 21.25 11.9808 21.0236Q12.5581 20.7895 13.0033 20.3444L13.5336 20.8747L13.0033 20.3444L13.5336 20.8747L13.0033 20.3444L20.3444 13.0033L20.3444 13.0033Q20.7813 12.5664 21.0167 11.9951Q21.2522 11.4238 21.25 10.8059L22 10.8032L21.25 10.8059L22 10.8032L21.25 10.8059L21.2255 3.94136L21.9755 3.93868L21.2255 3.94136Q21.2238 3.45875 20.8825 3.1175Q20.5413 2.77624 20.0586 2.77452L20.0613 2.02452L20.0586 2.77452L20.0613 2.02452L20.0586 2.77452L13.1941 2.75002L13.1941 2.75002Q12.5762 2.74781 12.0049 2.98326Q11.4336 3.21871 10.9967 3.65564ZM17.6835 8.54962C17.6835 10.0248 16.4877 11.2206 15.0125 11.2206L15.0125 10.4706L15.0125 11.2206C13.5373 11.2206 12.3415 10.0248 12.3415 8.54962L13.0915 8.54962L12.3415 8.54962C12.3415 7.07446 13.5373 5.8786 15.0125 5.8786L15.0125 6.6286L15.0125 5.8786C16.4877 5.8786 17.6835 7.07446 17.6835 8.54962L16.9335 8.54962L17.6835 8.54962ZM16.1835 8.54962L16.1835 8.54962C16.1835 7.90288 15.6592 7.3786 15.0125 7.3786L15.0125 7.3786C14.3658 7.3786 13.8415 7.90288 13.8415 8.54962L13.8415 8.54962C13.8415 9.19636 14.3658 9.72065 15.0125 9.72065L15.0125 9.72065C15.6592 9.72065 16.1835 9.19636 16.1835 8.54962Z"></path></svg>查看JSON文件';
+                        jsonBtn.innerHTML = '<span class="icons json"></span>查看JSON文件';
                         jsonBtn.className = 'download-btn';
                         jsonBtn.target = '_blank';
 
@@ -356,6 +624,8 @@
 
                         details.appendChild(summary);
                         detailsContainer.appendChild(details);
+
+                        document.body.style.justifyContent = 'flex-start';
                         break;
                 }
             };
@@ -365,6 +635,9 @@
                 startBtn.style.display = 'flex';
                 pauseBtn.style.display = 'none';
                 stopBtn.style.display = 'none';
+                loadAnimate.classList.remove('unactive');
+                loadAnimate.classList.remove('active');
+                loadAnimate.classList.add('done');
             });
 
             eventSource.onerror = function () {
@@ -377,21 +650,30 @@
 
         function pauseRequest() {
             const pauseBtn = document.getElementById('pauseBtn');
+            const loadAnimate = document.getElementById('loadAnimate');
             if (eventSource) {
                 if (!isPaused) {
                     eventSource.close();
                     isPaused = true;
-                    pauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14" height="14" viewBox="0 0 14 14" fill="none"><path fill="#000000" d="M4.34987 1.44438L11.5964 5.47023C12.7966 6.13698 12.7966 7.86302 11.5964 8.52978L4.34987 12.5556C3.18345 13.2036 1.75 12.3602 1.75 11.0259L1.75 2.97415C1.75 1.6398 3.18345 0.796359 4.34987 1.44438Z"></path></svg>Continue';
+                    loadAnimate.classList.remove('active');
+                    loadAnimate.classList.remove('done');
+                    loadAnimate.classList.add('unactive');
+                    pauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14" height="14" viewBox="0 0 14 14" fill="none"><path fill="#000000" d="M4.34987 1.44438L11.5964 5.47023C12.7966 6.13698 12.7966 7.86302 11.5964 8.52978L4.34987 12.5556C3.18345 13.2036 1.75 12.3602 1.75 11.0259L1.75 2.97415C1.75 1.6398 3.18345 0.796359 4.34987 1.44438Z"></path></svg>';
                 } else {
                     const model = document.getElementById('modelSelect').value;
                     eventSource = new EventSource(`/fetch-data?model=${model}&startId=${currentProgress.completed}&endId=${currentProgress.total}`);
                     isPaused = false;
-                    pauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.85 1.4L3.15 1.4C2.3768 1.4 1.75 2.0268 1.75 2.8L1.75 11.2C1.75 11.9732 2.3768 12.6 3.15 12.6L3.85 12.6C4.6232 12.6 5.25 11.9732 5.25 11.2L5.25 2.8C5.25 2.0268 4.6232 1.4 3.85 1.4ZM10.85 1.4L10.15 1.4C9.3768 1.4 8.75 2.0268 8.75 2.8L8.75 11.2C8.75 11.9732 9.3768 12.6 10.15 12.6L10.85 12.6C11.6232 12.6 12.25 11.9732 12.25 11.2L12.25 2.8C12.25 2.0268 11.6232 1.4 10.85 1.4Z" fill-rule="evenodd"  fill="#000000" ></path></svg>Pause';
+                    loadAnimate.classList.remove('done');
+                    loadAnimate.classList.remove('unactive');
+                    loadAnimate.classList.add('active');
+                    pauseBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.85 1.4L3.15 1.4C2.3768 1.4 1.75 2.0268 1.75 2.8L1.75 11.2C1.75 11.9732 2.3768 12.6 3.15 12.6L3.85 12.6C4.6232 12.6 5.25 11.9732 5.25 11.2L5.25 2.8C5.25 2.0268 4.6232 1.4 3.85 1.4ZM10.85 1.4L10.15 1.4C9.3768 1.4 8.75 2.0268 8.75 2.8L8.75 11.2C8.75 11.9732 9.3768 12.6 10.15 12.6L10.85 12.6C11.6232 12.6 12.25 11.9732 12.25 11.2L12.25 2.8C12.25 2.0268 11.6232 1.4 10.85 1.4Z" fill-rule="evenodd"  fill="#000000" ></path></svg>';
                 }
             }
         }
 
         function stopRequest() {
+            const loadAnimate = document.getElementById('loadAnimate');
+
             if (eventSource) {
                 eventSource.close();
                 eventSource = null;
@@ -401,7 +683,10 @@
                 document.getElementById('stopBtn').style.display = 'none';
 
                 document.getElementById('progressBar').style.width = '0%';
-                document.getElementById('progressText').textContent = '0%';
+                document.getElementById('progressText').innerHTML = '';
+
+                loadAnimate.classList.remove('active');
+                loadAnimate.classList.remove('unactive');
             }
         }
 
@@ -414,10 +699,74 @@
         }
 
         // 页面加载完成后初始化下拉菜单
+        // document.addEventListener('DOMContentLoaded', function () {
+        //     const startSelect = document.getElementById('idSelectStart');
+        //     const endSelect = document.getElementById('idSelectEnd');
+        //     const modelSelect = document.getElementById('modelSelect');
+
+        //     // 填充起始值下拉框
+        //     wfIdRanges.forEach(range => {
+        //         const [start] = range.split('-');
+        //         const option = document.createElement('option');
+        //         option.value = range;
+        //         option.textContent = start;
+        //         startSelect.appendChild(option);
+        //     });
+
+        //     // 当起始值变化时更新结束值选项
+        //     startSelect.addEventListener('change', function () {
+        //         const selectedRange = this.value;
+        //         const [selectedStart] = selectedRange.split('-');
+        //         const selectedSeries = getSeriesType(selectedStart);
+
+        //         endSelect.innerHTML = '';
+
+        //         wfIdRanges.forEach(range => {
+        //             const [start, end] = range.split('-');
+        //             if (getSeriesType(start) === selectedSeries && range >= selectedRange) {
+        //                 const option = document.createElement('option');
+        //                 option.value = range;
+        //                 option.textContent = end;
+        //                 endSelect.appendChild(option);
+        //             }
+        //         });
+
+        //         checkRequestCount();
+        //     });
+
+        //     endSelect.addEventListener('change', checkRequestCount);
+
+        //     // 填充model下拉框
+        //     modelIds.forEach(model => {
+        //         const option = document.createElement('option');
+        //         option.value = model;
+        //         option.textContent = model;
+        //         modelSelect.appendChild(option);
+        //     });
+        // });
+
+        function getSeriesType(id) {
+            if (id.startsWith('120917300')) {
+                return 'series1';
+            } else if (id.startsWith('36626')) {
+                return 'series2';
+            } else if (id.startsWith('12091734') || id.startsWith('12091735')) {
+                return 'series3';
+            }
+        }
+
+        // 确保只有一个 DOMContentLoaded 事件处理程序
         document.addEventListener('DOMContentLoaded', function () {
             const startSelect = document.getElementById('idSelectStart');
             const endSelect = document.getElementById('idSelectEnd');
             const modelSelect = document.getElementById('modelSelect');
+            const warningBox = document.getElementById('warningBox');
+            const requestCountSpan = document.getElementById('requestCount');
+            const singleIdCheckbox = document.getElementById('singleIdCheckbox');
+            const singleIdInput = document.getElementById('singleIdInput');
+            const idSelectGroup = document.getElementById('idSelectGroup');
+            const idInputGroup = document.getElementById('idInputGroup');
+            const modeInfomation = document.getElementById('modeInfomation');
 
             // 填充起始值下拉框
             wfIdRanges.forEach(range => {
@@ -427,6 +776,44 @@
                 option.textContent = start;
                 startSelect.appendChild(option);
             });
+
+            // 填充model下拉框
+            modelIds.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                modelSelect.appendChild(option);
+            });
+
+            // 定义检查请求数量的函数
+            function checkRequestCount() {
+                // 如果是单个ID搜索，不需要显示警告
+                if (singleIdCheckbox.checked) {
+                    warningBox.style.display = 'none';
+                    return;
+                }
+
+                const startRange = startSelect.value;
+                const endRange = endSelect.value;
+
+                if (!startRange || !endRange) return; // 防止在下拉框未初始化时执行
+
+                const [startId] = startRange.split('-');
+                const [, endId] = endRange.split('-');
+
+                const requestCount = Math.floor((parseInt(endId) - parseInt(startId))) + 1;
+                // const requestCount = Math.floor((parseInt(endId) - parseInt(startId)) / 1000) + 1;
+
+                console.log("检查请求数量:", requestCount); // 添加调试信息
+
+                // 使用 4000 作为阈值
+                if (requestCount >= 4000) {
+                    requestCountSpan.textContent = requestCount;
+                    warningBox.style.display = 'flex';
+                } else {
+                    warningBox.style.display = 'none';
+                }
+            }
 
             // 当起始值变化时更新结束值选项
             startSelect.addEventListener('change', function () {
@@ -446,80 +833,215 @@
                     }
                 });
 
-                checkRequestCount();
+                // 在更新结束值选项后检查请求数量
+                setTimeout(checkRequestCount, 0);
             });
 
+            // 初始化显示状态 - 默认选中单个表盘搜索
+            startSelect.disabled = true;
+            endSelect.disabled = true;
+            singleIdInput.disabled = false;
+            modeInfomation.textContent = "单项搜索";
+            warningBox.style.display = 'none';
+
+            // 更新显示模式的函数
+            function updateDisplayMode(isSingleMode) {
+                // 更新组的显示状态
+                idSelectGroup.style.display = isSingleMode ? 'none' : 'flex';
+                idInputGroup.style.display = isSingleMode ? 'flex' : 'none';
+
+                // 更新模式信息
+                modeInfomation.textContent = isSingleMode ? "单项搜索" : "范围搜索";
+
+                // 更新输入控件状态
+                singleIdInput.disabled = !isSingleMode;
+                startSelect.disabled = isSingleMode;
+                endSelect.disabled = isSingleMode;
+
+                // 检查请求数量
+                setTimeout(checkRequestCount, 0);
+            }
+
+            // 初始化显示模式
+            updateDisplayMode(true);
+
+            // 添加复选框状态变化的事件监听器
+            singleIdCheckbox.addEventListener('change', function () {
+                updateDisplayMode(this.checked);
+            });
+
+            // 在结束值变化时检查请求数量
             endSelect.addEventListener('change', checkRequestCount);
 
-            // 填充model下拉框
-            modelIds.forEach(model => {
-                const option = document.createElement('option');
-                option.value = model;
-                option.textContent = model;
-                modelSelect.appendChild(option);
-            });
+            // 触发初始的结束值填充
+            if (startSelect.options.length > 0) {
+                startSelect.dispatchEvent(new Event('change'));
+            }
+        });
 
-            // 初始化拖拽功能
-            const layoutHeader = document.querySelector('.layout-header');
-            const layout = document.querySelector('.layout');
-            let isResizing = false;
-            let startY;
-            let startHeight;
+        
+        // 带动画的模态框关闭函数
+        function closeModalWithAnimation(modal) {
+            modal.classList.add('hide');
+            setTimeout(() => {
+                document.body.removeChild(modal);
+            }, 300); // 等待动画完成
+        }
 
-            layoutHeader.addEventListener('mousedown', function (e) {
-                isResizing = true;
-                startY = e.clientY;
-                startHeight = parseInt(getComputedStyle(layout).height);
+        function showMenu() {
+            // const menu = document.getElementById('menu');
+            // if (menu.classList.contains('menu-visible')) {
+            //     menu.classList.remove('menu-visible');
+            // } else {
+            //     menu.classList.add('menu-visible');
+            // }
+            const menu = document.getElementById('menu');
+            menu.classList.toggle('menu-visible');
 
-                // document.body.style.cursor = 'row-resize';
-                // layoutHeader.style.cursor = 'row-resize';
-            });
+            event.stopPropagation();
+        }
 
-            document.addEventListener('mousemove', function (e) {
-                if (!isResizing) return;
+        function clearLogs() {
+            const logsDiv = document.getElementById('logs');
+            logsDiv.innerHTML = '<table id="logTable" class="log-table"><tbody><tr><td class="log-notfound"><span style="color:rgb(97, 97, 97);">[SERVER] Waiting for start search...</span></td></tr></tbody></table>';
+            showMenu();
+        }
 
-                const deltaY = startY - e.clientY;
-                const newHeight = startHeight + deltaY;
+        function showAboutInfo() {
+            // 创建一个轻量级的模态对话框
+            const modal = document.createElement('div');
+            modal.className = 'light-modal';
 
-                if (newHeight > 100) {
-                    layout.style.height = newHeight + 'px';
+            const content = document.createElement('div');
+            content.className = 'light-modal-content';
+
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'light-modal-close';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = function () {
+                document.body.removeChild(modal);
+            };
+
+            const logo = document.createElement('img');
+            logo.width = 48;
+            logo.src = './favicon.large.png';
+
+            const title = document.createElement('h2');
+            title.textContent = 'Get Xiaomi Watchface';
+
+            const info = document.createElement('p');
+            info.innerHTML = '这是一个用于获取小米手表表盘的工具，可以通过ID搜索或范围搜索获取表盘资源。<br><br>版本: 1.0.0';
+
+            content.appendChild(closeBtn);
+            content.appendChild(logo);
+            content.appendChild(title);
+            content.appendChild(info);
+            modal.appendChild(content);
+
+            document.body.appendChild(modal);
+
+            modal.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                    closeModalWithAnimation(modal);
                 }
             });
 
-            document.addEventListener('mouseup', function () {
-                isResizing = false;
-                // document.body.style.cursor = 'default';
-                // layoutHeader.style.cursor = 'default';
+            showMenu(); // 关闭菜单
+        }
+
+        function showCopyrightInfo() {
+            // 创建一个轻量级的模态对话框
+            const modal = document.createElement('div');
+            modal.className = 'light-modal';
+
+            const content = document.createElement('div');
+            content.className = 'light-modal-content';
+
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'light-modal-close';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = function () {
+                document.body.removeChild(modal);
+            };
+
+            const title = document.createElement('h3');
+            title.textContent = '版权警示';
+
+            const info01 = document.createElement('p');
+            info01.innerHTML = '本工具仅供个人学习和研究使用，请勿用于商业用途。';
+            const info02 = document.createElement('p');
+            info02.innerHTML = '所有表盘资源的版权归原作者所有，请尊重知识产权；通过本工具下载到的表盘资源，请勿进行二次分发、修改或用于商业目的。';
+            const info03 = document.createElement('p');
+            info03.innerHTML = '如因错误使用本工具或通过本工具下载的表盘资源而造成版权或其他法律问题，本工具及作者不承担任何责任。';
+            const info04 = document.createElement('p');
+            info04.innerHTML = '请在使用本工具前自行仔细阅读并遵守相关法律法规。';
+
+            content.appendChild(closeBtn);
+            content.appendChild(title);
+            content.appendChild(info01);
+            content.appendChild(info02);
+            content.appendChild(info03);
+            content.appendChild(info04);
+            modal.appendChild(content);
+
+            document.body.appendChild(modal);
+
+            modal.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                    closeModalWithAnimation(modal);
+                }
             });
+
+            showMenu(); // 关闭菜单
+        }
+
+        // 添加ESC键关闭弹窗功能
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                // 关闭所有模态框
+                const modals = document.querySelectorAll('.light-modal');
+                modals.forEach(modal => {
+                    closeModalWithAnimation(modal);
+                });
+
+                // 关闭服务器离线通知
+                const finalWarning = document.getElementById('final-warning-notification');
+                if (finalWarning) {
+                    finalWarning.classList.add('hide');
+                    setTimeout(() => {
+                        finalWarning.remove();
+                    }, 300);
+                    reconnectAttempts = 0; // 重置计数
+                    checkServerStatus(); // 重新开始检查
+                }
+            }
         });
 
-        function getSeriesType(id) {
-            if (id.startsWith('120917300')) {
-                return 'series1';
-            } else if (id.startsWith('36626')) {
-                return 'series2';
-            } else if (id.startsWith('12091734') || id.startsWith('12091735')) {
-                return 'series3';
-            }
+        function openGithub() {
+            window.open('https://github.com/useless-anlong/get-mi-watchface', '_blank');
         }
 
-        function checkRequestCount() {
-            const startRange = document.getElementById('idSelectStart').value;
-            const endRange = document.getElementById('idSelectEnd').value;
-            const [startId] = startRange.split('-');
-            const [, endId] = endRange.split('-');
+        document.addEventListener('click', function (event) {
+            const menu = document.getElementById('menu');
+            const menuBtn = document.getElementById('menuBtn');
 
-            const requestCount = Math.floor((parseInt(endId) - parseInt(startId)) / 1000) + 1;
-            const warningBox = document.getElementById('warningBox');
-            const requestCountSpan = document.getElementById('requestCount');
-
-            if (requestCount > 3000) {
-                requestCountSpan.textContent = requestCount;
-                warningBox.style.display = 'block';
-            } else {
-                warningBox.style.display = 'none';
+            // 如果菜单是可见的，并且点击的不是菜单本身或菜单按钮
+            if (menu && menu.classList.contains('menu-visible') &&
+                !menu.contains(event.target) &&
+                menuBtn !== event.target &&
+                !menuBtn.contains(event.target)) {
+                menu.classList.remove('menu-visible');
             }
-        }
+        });
+
+        document.getElementById('menu').addEventListener('click', function (event) {
+            // 如果点击的是菜单项（即有onclick属性的元素），不阻止冒泡
+            // 这样菜单项的点击事件仍然可以触发
+            if (!event.target.hasAttribute('onclick') &&
+                !event.target.parentElement.hasAttribute('onclick')) {
+                event.stopPropagation();
+            }
+        });
     </script>
 </body>
 
