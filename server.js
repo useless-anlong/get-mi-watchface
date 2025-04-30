@@ -1,6 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+// const open = require('open');
+const { exec } = require('child_process');
+const readline = require('readline');
 
 const app = express();
 const path = require('path');
@@ -66,14 +69,20 @@ app.get('/fetch-data', async (req, res) => {
     res.end();
 });
 
+readline.emitKeypressEvents(process.stdin);
+if (process.stdin.isTTY) {
+    process.stdin.setRawMode(true);
+}
+
 const PORT = process.env.PORT || 3000;
 const chalk = require('chalk');
-const supportsColor = chalk.supportsColor;
+// const supportsColor = chalk.supportsColor;
 
 // 启动服务器并显示ASCII字符画
 app.listen(PORT, () => {
     const link = chalk.rgb(35, 110, 255).underline(`localhost:${PORT}`)
     const stopTips = chalk.red(`按下 [CTRL] + [C] 组合键来停止服务`)
+    const openTips = chalk.green(`[ENTER]`)
     const githubLink = chalk.gray.underline(`github.com/useless-anlong/get-mi-watchface`)
     // 你的ASCII字符画
     const asciiArtPart1 = `
@@ -123,9 +132,39 @@ app.listen(PORT, () => {
     const coloredPart5 = applyColorToAsciiArt(asciiArtPart5);
 
     // 打印彩色字符画
-    console.log(coloredPart1 + githubLink + '\n' + coloredPart2 + '\n' + coloredPart3 + link + ' 以开始使用' + '\n' + coloredPart4 + '\n' + coloredPart5 + stopTips + '\n' + coloredPart5);
-    // console.log(coloredPart3);
-    // console.log(coloredPart2);
+    console.log(coloredPart1 + githubLink + '\n' + coloredPart2 + '\n' + coloredPart3 + link + ' 或按下 ' + openTips + ' 键开始使用' + '\n' + coloredPart4 + '\n' + coloredPart5 + stopTips + '\n' + coloredPart5);
+
+    // 监听键盘事件
+    process.stdin.on('keypress', (str, key) => {
+        // 如果按下回车键，打开浏览器
+        if (key && (key.name === 'return' || key.name === 'enter')) {
+            // console.log(chalk.green(`正在打开浏览器访问 localhost:${PORT}...`));
+            const url = `http://localhost:${PORT}`;
+            let command;
+
+            switch (process.platform) {
+                case 'darwin': // macOS
+                    command = `open "${url}"`;
+                    break;
+                case 'win32': // Windows
+                    command = `start "" "${url}"`;
+                    break;
+                default: // Linux
+                    command = `xdg-open "${url}"`;
+            }
+
+            exec(command, (error) => {
+                if (error) {
+                    console.error(chalk.red(`无法打开浏览器: ${error}`));
+                }
+            });
+        }
+
+        // 保持 CTRL+C 退出功能
+        if (key && key.ctrl && key.name === 'c') {
+            process.exit();
+        }
+    });
 });
 
 app.get('/ping', (_req, res) => {
