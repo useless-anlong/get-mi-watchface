@@ -69,49 +69,63 @@ const supportsColor = chalk.supportsColor;
 
 // 启动服务器并显示ASCII字符画
 app.listen(PORT, () => {
-    console.log('\n');
-
+    const link = chalk.rgb(35, 110, 255).underline(`localhost:${PORT}`)
+    const stopTips = chalk.red(`按下 [CTRL] + [C] 组合键来停止服务`)
+    const githubLink = chalk.gray.underline(`github.com/useless-anlong/get-mi-watchface`)
     // 你的ASCII字符画
-    const asciiArt = `
-      ..:-----========-----:..      
-   .:-===========--===========-:.          Get Xiaomi Watchface
-  -==============**==============-         Version: 1.0.0
- -=============-+@@+-=============-        
-:==============-+@@+-==============:       https://github.com/useless-anlong/get-mi-watchface
--=========--===-+@@+-===--=========-       
-==========++=---+@@+---=++==========       
-==========%@@#+-+@@+-+#@@%==========
-==========-=#@@%#@@#%@@#=-==========       
--===========-=*%@@@@%*=-===========-
-:========-------=**=-------========:       Server running at
- -======-*%%%%%%%%%%%%%%%%*-======-        http://localhost:${PORT}
-  -=====-+****************+-=====-         
-   .:-===------------------===-:.          Press [CTRL] + [C] to stop the server
-      ..:----==========----:..             
-  `;
+    const asciiArtPart1 = `
+================================
+================================      GET XIAOMI WATCHFACE
+===============**===============      版本 v1.0.0
+===============@@===============
+===============@@===============      `
+
+    const asciiArtPart2 = `===============@@===============
+=========@@#===@@===#@@=========
+==========*@@#+@@+#@@*==========
+============*@@@@@@*============
+==============+##+==============      前端服务已启动`;
+
+    const asciiArtPart3 = `========++++++++++++++++========      请访问 `;
+
+    const asciiArtPart4 = `========+##############+========      `;
+
+    const asciiArtPart5 = `================================      `;
 
     // 使用chalk添加颜色 - 更精细的颜色控制
-    const coloredAsciiArt = asciiArt.split('\n').map(line => {
-        let coloredLine = '';
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            // 根据字符类型应用不同颜色
-            if (char === '@' || char === '*' || char === '+' || char === '%') {
-                coloredLine += chalk.white(char); // @*+% 符号为白色
-            } else if (char === '=' || char === '-' || char === ':' || char === '.') {
-                coloredLine += chalk.rgb(35, 110, 255)(char); // 其他符号为RGB(35, 110, 255)蓝色
-            } else {
-                coloredLine += chalk.white(char);
+    const applyColorToAsciiArt = (asciiArt) => {
+        return asciiArt.split('\n').map(line => {
+            let coloredLine = '';
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                // 根据字符类型应用不同颜色
+                if (char === '@' || char === '*' || char === '+' || char === '#') {
+                    coloredLine += chalk.white(char); // @*+# 符号为白色
+                } else if (char === '=') {
+                    coloredLine += chalk.rgb(35, 110, 255)(char); // = 符号为RGB(35, 110, 255)蓝色
+                } else if (char >= 'A' && char <= 'Z') {
+                    coloredLine += chalk.rgb(35, 110, 255)(char); // 大写字母为蓝色
+                } else {
+                    coloredLine += chalk.white(char);
+                }
             }
-        }
-        return coloredLine;
-    }).join('\n');
+            return coloredLine;
+        }).join('\n');
+    };
+
+    const coloredPart1 = applyColorToAsciiArt(asciiArtPart1);
+    const coloredPart2 = applyColorToAsciiArt(asciiArtPart2);
+    const coloredPart3 = applyColorToAsciiArt(asciiArtPart3);
+    const coloredPart4 = applyColorToAsciiArt(asciiArtPart4);
+    const coloredPart5 = applyColorToAsciiArt(asciiArtPart5);
 
     // 打印彩色字符画
-    console.log(coloredAsciiArt);
+    console.log(coloredPart1 + githubLink + '\n' + coloredPart2  + '\n' + coloredPart3 + link + ' 以开始使用' + '\n' + coloredPart4+ '\n'  + coloredPart5 + stopTips + '\n' + coloredPart5);
+    // console.log(coloredPart3);
+    // console.log(coloredPart2);
 });
 
-app.get('/ping', (req, res) => {
+app.get('/ping', (_req, res) => {
     res.status(200).send('pong');
 });
 

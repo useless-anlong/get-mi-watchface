@@ -1,0 +1,1 @@
+Invoke-ps2exe -inputFile '.\batch-processing\initialize.ps1' -outputFile '.\initialize.exe' -title 'initialize Get Xiaomi Watchface' -version '1.0.0'
