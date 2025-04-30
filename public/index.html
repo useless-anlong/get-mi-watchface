@@ -16,7 +16,7 @@
         <div id="console">
             <div class="fetch-console-container">
                 <input type="checkbox" id="singleIdCheckbox" checked>
-                <label for="singleIdCheckbox" id="modeInfomation">单项搜索</label>
+                <label for="singleIdCheckbox" id="modeInfomation" title="点击以切换搜索模式">单项搜索</label>
                 <div class="input-group" id="idSelectGroup">
                     <p>遍历所有 ID 为从</p>
                     <div class="select-box">
@@ -737,6 +737,7 @@
                         currentProgress.total = data.total;
                         progressBar.style.width = `calc(${data.progress}vw - (4px * 2))`;
                         progressText.innerHTML = `${Math.round(data.progress)}%<span>${data.completed}/${data.total}</span>`;
+                        document.title = `已完成 ${Math.round(data.progress)}% - Get Xiaomi Watchface`;
                         break;
 
                     case 'log':
@@ -951,7 +952,7 @@
             title.textContent = 'Get Xiaomi Watchface';
 
             const info = document.createElement('p');
-            info.innerHTML = '版本 V1.0.0<br><br>一款完全开源的专业小米表盘商店抓取工具';
+            info.innerHTML = '版本 V1.0.0<br><br>一款完全开源且无需登录账户的小米表盘商店抓取工具';
 
             content.appendChild(header);
             header.appendChild(headerContent);
