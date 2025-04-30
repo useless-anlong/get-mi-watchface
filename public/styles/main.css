@@ -26,14 +26,15 @@ body {
     padding: 0;
     align-items: center;
     height: 100vh;
-    user-select: none;background-color: #f1f1f1;
+    user-select: none;
+    background-color: #f1f1f1;
 }
 
 .progress-bar {
     height: 4px;
     z-index: 10;
     display: block;
-    background: #236eff;
+    background: var(--primary-color);
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -249,12 +250,12 @@ button#startBtn {
 }
 
 button#startBtn {
-    background: #236eff;
+    background: var(--primary-color);
     color: white;
 }
 
 button#startBtn:hover {
-    background: #6397ff;
+    background: color-mix(in srgb, var(--primary-color) 75%, transparent);
     color: white;
 }
 
@@ -322,7 +323,7 @@ button svg path {
 }
 
 .download-btn:hover {
-    background: #236eff;
+    background: var(--primary-color);
     color: white;
 }
 
@@ -362,84 +363,20 @@ select {
     justify-content: flex-start;
     align-items: center;
     padding: 4px 6px;
-    background: #236cff1a;
-    color: #236eff;
-    border-radius: 6px;
+    background: transparent;
     appearance: none;
     min-height: 26px;
     min-width: 118px;
 }
 
+.select-box {
+    background: #eeeeee;
+    border-radius: 6px;
+}
+
 .settings-table select {
     width: 100%;
     padding: 6px;
-}
-
-.layout {
-    display: flex;
-    /* position: fixed;
-    width: 100vw; */
-}
-
-.sidebar {
-    /* width: 200px; */
-    background: #f0f2f5;
-}
-
-.tab-item {
-    padding: 12px 24px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    font-family: 'JetBrainsMapleMono', system-ui, monospace;
-}
-
-.tab-item:hover {
-    background: #e6e8eb;
-}
-
-.tab-item.active {
-    background: #1890ff;
-    color: white;
-}
-
-.content {
-    flex: 1;
-}
-
-.tab-content {
-    display: none;
-    height: 100%;
-    width: 100%;
-}
-
-.tab-content.active {
-    display: flex;
-}
-
-#layout-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    position: fixed;
-    width: 100vw;
-    bottom: 0;
-}
-
-.layout-header {
-    width: 100vw;
-    height: 1px;
-    background: rgb(209, 209, 209);
-    transform: scaleY(1);
-    transition: all 0.1s ease;
-}
-
-.layout-header:hover {
-    background: rgb(137, 137, 137);
-    transform: scaleY(10);
-    cursor: row-resize;
 }
 
 .single-id-search {
@@ -468,8 +405,8 @@ select {
     justify-content: flex-start;
     align-items: center;
     padding: 4px 6px;
-    background: #236cff1a;
-    color: #236eff;
+    background: color-mix(in srgb, var(--primary-color) 15%, transparent);
+    color: var(--primary-color);
     border-radius: 6px;
 }
 
@@ -486,12 +423,12 @@ input[type="number"] {
 
 input:-moz-placeholder,
 textarea:-moz-placeholder {
-    color: #236cff60;
+    color: color-mix(in srgb, var(--primary-color) 35%, transparent);
 }
 
 input::-webkit-input-placeholder,
 textarea::-webkit-input-placeholder {
-    color: #236cff60;
+    color: color-mix(in srgb, var(--primary-color) 35%, transparent);
 }
 
 #singleIdInput:disabled {
@@ -510,14 +447,14 @@ textarea::-webkit-input-placeholder {
     justify-content: center;
     font-weight: 600;
     font-size: 14px;
-    color: #236eff;
+    color: var(--primary-color);
     border-radius: 6px;
     user-select: none;
     transition: all 0.1s ease;
 }
 
 #modeInfomation:hover {
-    background: #236cff1a;
+    background: color-mix(in srgb, var(--primary-color) 15%, transparent);
     cursor: pointer;
 }
 
@@ -544,10 +481,10 @@ p {
     position: relative;
     width: 12px;
     height: 12px;
-    border: 1.5px solid #236eff;
-    border-top-color: #236cff2d;
-    border-right-color: #236cff2d;
-    border-bottom-color: #236cff2d;
+    border: 1.5px solid var(--primary-color);
+    border-top-color: color-mix(in srgb, var(--primary-color) 40%, transparent);
+    border-right-color: color-mix(in srgb, var(--primary-color) 40%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--primary-color) 40%, transparent);
     border-radius: 100%;
     transition: all 0.1s ease;
     opacity: 0;
@@ -561,15 +498,15 @@ p {
 #loadAnimate.unactive {
     animation: pauseCircle infinite 1.25s linear;
     opacity: 1;
-    border: 1.5px solid #236cff6f;
-    border-top-color: #236cff6f;
-    border-right-color: #236cff6f;
-    border-bottom-color: #236cff6f;
+    border: 1.5px solid color-mix(in srgb, var(--primary-color) 50%, transparent);
+    border-top-color: color-mix(in srgb, var(--primary-color) 50%, transparent);
+    border-right-color: color-mix(in srgb, var(--primary-color) 50%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--primary-color) 50%, transparent);
 }
 
 #loadAnimate.done {
-    border: 1.5px solid #12b875;
-    background: #12b875;
+    border: 1.5px solid var(--succcess-color);
+    background: var(--succcess-color);
     opacity: 1;
     display: flex;
     align-items: center;
@@ -610,7 +547,7 @@ p {
 }
 
 #progressText span {
-    opacity: 0.5;
+    opacity: 50%;
 }
 
 #progressText {
@@ -751,7 +688,7 @@ p {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 50%);
     display: flex;
     justify-content: center;
     align-items: center;

@@ -3,8 +3,11 @@ const cors = require('cors');
 const axios = require('axios');
 
 const app = express();
+const path = require('path');
 app.use(cors());
 app.use(express.static('public'));
+
+app.use('/config.json', express.static(path.join(__dirname, 'config.json')));
 
 app.get('/fetch-data', async (req, res) => {
     const { model, startId, endId } = req.query;
@@ -120,7 +123,7 @@ app.listen(PORT, () => {
     const coloredPart5 = applyColorToAsciiArt(asciiArtPart5);
 
     // 打印彩色字符画
-    console.log(coloredPart1 + githubLink + '\n' + coloredPart2  + '\n' + coloredPart3 + link + ' 以开始使用' + '\n' + coloredPart4+ '\n'  + coloredPart5 + stopTips + '\n' + coloredPart5);
+    console.log(coloredPart1 + githubLink + '\n' + coloredPart2 + '\n' + coloredPart3 + link + ' 以开始使用' + '\n' + coloredPart4 + '\n' + coloredPart5 + stopTips + '\n' + coloredPart5);
     // console.log(coloredPart3);
     // console.log(coloredPart2);
 });
