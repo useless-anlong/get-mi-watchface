@@ -116,7 +116,7 @@
                             height="14" viewBox="0 0 14 14" fill="none">
                             <path
                                 d="M3.85 1.4L3.15 1.4C2.3768 1.4 1.75 2.0268 1.75 2.8L1.75 11.2C1.75 11.9732 2.3768 12.6 3.15 12.6L3.85 12.6C4.6232 12.6 5.25 11.9732 5.25 11.2L5.25 2.8C5.25 2.0268 4.6232 1.4 3.85 1.4ZM10.85 1.4L10.15 1.4C9.3768 1.4 8.75 2.0268 8.75 2.8L8.75 11.2C8.75 11.9732 9.3768 12.6 10.15 12.6L10.85 12.6C11.6232 12.6 12.25 11.9732 12.25 11.2L12.25 2.8C12.25 2.0268 11.6232 1.4 10.85 1.4Z"
-                                fill-rule="evenodd" fill="#000000">
+                                fill-rule="evenodd" fill="currentColor">
                             </path>
                         </svg>
                     </button>
@@ -125,7 +125,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14"
                             height="14" viewBox="0 0 14 14" fill="none">
                             <rect x="1.4000015258789062" y="1.3999996185302734" width="11.200000762939453"
-                                height="11.200000762939453" rx="2.0999999999999996" fill="#000000">
+                                height="11.200000762939453" rx="2.0999999999999996" fill="currentColor">
                             </rect>
                         </svg>
                     </button>
@@ -752,6 +752,8 @@
                         const details = document.createElement('details');
                         const summary = document.createElement('summary');
                         const displayName = data.data.data.recommend_list[0].display_name;
+                        
+                        details.setAttribute('name', 'watchfaceCard');
 
                         // 创建图片容器
                         const imgContainer = document.createElement('div');
@@ -920,31 +922,43 @@
             modal.className = 'light-modal';
 
             const content = document.createElement('div');
-            content.className = 'light-modal-content';
+            content.className = 'light-modal-content about';
+
+            const header = document.createElement('div');
+            header.className = 'light-modal-header';
+
+            const headerContent = document.createElement('span');
+            headerContent.className = 'light-modal-header-content';
+
+            headerContent.innerHTML = `<svg width="16" height="16" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                       <path d="M12 1.999c5.524 0 10.002 4.478 10.002 10.002 0 5.523-4.478 10.001-10.002 10.001-5.524 0-10.002-4.478-10.002-10.001C1.998 6.477 6.476 1.999 12 1.999Zm0 1.5a8.502 8.502 0 1 0 0 17.003A8.502 8.502 0 0 0 12 3.5Zm-.004 7a.75.75 0 0 1 .744.648l.007.102.003 5.502a.75.75 0 0 1-1.493.102l-.007-.101-.003-5.502a.75.75 0 0 1 .75-.75ZM12 7.003a.999.999 0 1 1 0 1.997.999.999 0 0 1 0-1.997Z" fill="currentColor" /></svg>
+                                       关于`;
 
             const closeBtn = document.createElement('span');
             closeBtn.className = 'light-modal-close';
-            closeBtn.innerHTML = '&times;';
+            closeBtn.innerHTML = `<svg height="10" width="10" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M512,620.5L131,1001.5C124,1008.5 115.75,1014 106.25,1018C96.75,1022 87,1024 77,1024C66.3333,1024 56.3333,1022 47,1018C37.6667,1014 29.5,1008.5 22.5,1001.5C15.5,994.5 10,986.333 6,977C2,967.667 0,957.667 0,947C0,937 2,927.25 6,917.75C10,908.25 15.5,900 22.5,893L403.5,512L22.5,131C15.1667,123.667 9.58333,115.25 5.75,105.75C1.91667,96.25 0,86.5 0,76.5C0,65.8334 2,55.8334 6,46.5C10,37.1667 15.5,29.0834 22.5,22.25C29.5,15.4167 37.6667,10 47,6C56.3333,2 66.3333,0 77,0C87,0 96.75,2 106.25,6C115.75,10 124,15.5 131,22.5L512,403.5L893,22.5C908,7.5 926.167,0 947.5,0C957.833,0 967.667,2 977,6C986.333,10 994.5,15.5 1001.5,22.5C1008.5,29.5 1014,37.6667 1018,47C1022,56.3334 1024,66.1667 1024,76.5C1024,86.5 1022.08,96.25 1018.25,105.75C1014.42,115.25 1008.83,123.667 1001.5,131L620.5,512L1001.5,893C1008.5,900 1014,908.25 1018,917.75C1022,927.25 1024,937 1024,947C1024,957.667 1022,967.667 1018,977C1014,986.333 1008.5,994.5 1001.5,1001.5C994.5,1008.5 986.333,1014 977,1018C967.667,1022 957.667,1024 947,1024C937,1024 927.25,1022 917.75,1018C908.25,1014 900,1008.5 893,1001.5Z" fill="currentColor" fill-opacity="1">
+  </path>
+</svg>`;
             closeBtn.onclick = function () {
-                // if (event.target === closeBtn) {
                 closeModalWithAnimation(modal);
-                // }
             };
 
-            const logo = document.createElement('img');
-            logo.width = 48;
-            logo.src = './favicon.large.png';
+            const contentBody = document.createElement('div');
+            contentBody.className = 'light-modal-content-body';
 
-            const title = document.createElement('h2');
+            const title = document.createElement('h1');
             title.textContent = 'Get Xiaomi Watchface';
 
             const info = document.createElement('p');
-            info.innerHTML = '这是一个用于获取小米手表表盘的工具，可以通过ID搜索或范围搜索获取表盘资源。<br><br>版本: 1.0.0';
+            info.innerHTML = '版本 V1.0.0<br><br>一款完全开源的专业小米表盘商店抓取工具';
 
-            content.appendChild(closeBtn);
-            content.appendChild(logo);
-            content.appendChild(title);
-            content.appendChild(info);
+            content.appendChild(header);
+            header.appendChild(headerContent);
+            header.appendChild(closeBtn);
+            content.appendChild(contentBody);
+            contentBody.appendChild(title);
+            contentBody.appendChild(info);
             modal.appendChild(content);
 
             document.body.appendChild(modal);
@@ -966,19 +980,31 @@
             const content = document.createElement('div');
             content.className = 'light-modal-content';
 
+            const header = document.createElement('div');
+            header.className = 'light-modal-header';
+
+            const headerContent = document.createElement('span');
+            headerContent.className = 'light-modal-header-content';
+
+            headerContent.innerHTML = `<svg width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                       <path d="M9 1.5C13.1422 1.5 16.5 4.85775 16.5 9C16.5 13.1422 13.1422 16.5 9 16.5C4.85775 16.5 1.5 13.1422 1.5 9C1.5 4.85775 4.85775 1.5 9 1.5ZM9 2.625C7.30924 2.625 5.68773 3.29664 4.49219 4.49219C3.29664 5.68773 2.625 7.30924 2.625 9C2.625 10.6908 3.29664 12.3123 4.49219 13.5078C5.68773 14.7034 7.30924 15.375 9 15.375C10.6908 15.375 12.3123 14.7034 13.5078 13.5078C14.7034 12.3123 15.375 10.6908 15.375 9C15.375 7.30924 14.7034 5.68773 13.5078 4.49219C12.3123 3.29664 10.6908 2.625 9 2.625ZM9.06641 4.76953C10.1136 4.7696 11.073 5.15268 11.8105 5.78418L11.9551 5.91309L12.0312 6.00098C12.1836 6.21737 12.1686 6.51819 11.9805 6.71875C11.792 6.91941 11.4923 6.95326 11.2666 6.81445L11.1748 6.74414L10.959 6.55957C10.4366 6.1523 9.7799 5.91022 9.06641 5.91016C7.36512 5.9103 5.98569 7.28998 5.98535 8.99219C5.98553 10.6945 7.36502 12.075 9.06641 12.0752C9.8822 12.0751 10.6232 11.7583 11.1748 11.2402L11.2666 11.1699C11.4922 11.0311 11.7919 11.0652 11.9805 11.2656C12.1956 11.4951 12.1844 11.8559 11.9551 12.0713L11.8105 12.2012C11.073 12.8327 10.1136 13.2148 9.06641 13.2148C6.73508 13.2147 4.84491 11.3238 4.84473 8.99219C4.84506 6.66071 6.73518 4.76968 9.06641 4.76953Z" fill="currentColor" /></svg>
+                                       版权警示`;
+
             const closeBtn = document.createElement('span');
             closeBtn.className = 'light-modal-close';
-            closeBtn.innerHTML = '&times;';
+            closeBtn.innerHTML = `<svg height="10" width="10" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <path d="M512,620.5L131,1001.5C124,1008.5 115.75,1014 106.25,1018C96.75,1022 87,1024 77,1024C66.3333,1024 56.3333,1022 47,1018C37.6667,1014 29.5,1008.5 22.5,1001.5C15.5,994.5 10,986.333 6,977C2,967.667 0,957.667 0,947C0,937 2,927.25 6,917.75C10,908.25 15.5,900 22.5,893L403.5,512L22.5,131C15.1667,123.667 9.58333,115.25 5.75,105.75C1.91667,96.25 0,86.5 0,76.5C0,65.8334 2,55.8334 6,46.5C10,37.1667 15.5,29.0834 22.5,22.25C29.5,15.4167 37.6667,10 47,6C56.3333,2 66.3333,0 77,0C87,0 96.75,2 106.25,6C115.75,10 124,15.5 131,22.5L512,403.5L893,22.5C908,7.5 926.167,0 947.5,0C957.833,0 967.667,2 977,6C986.333,10 994.5,15.5 1001.5,22.5C1008.5,29.5 1014,37.6667 1018,47C1022,56.3334 1024,66.1667 1024,76.5C1024,86.5 1022.08,96.25 1018.25,105.75C1014.42,115.25 1008.83,123.667 1001.5,131L620.5,512L1001.5,893C1008.5,900 1014,908.25 1018,917.75C1022,927.25 1024,937 1024,947C1024,957.667 1022,967.667 1018,977C1014,986.333 1008.5,994.5 1001.5,1001.5C994.5,1008.5 986.333,1014 977,1018C967.667,1022 957.667,1024 947,1024C937,1024 927.25,1022 917.75,1018C908.25,1014 900,1008.5 893,1001.5Z" fill="currentColor" fill-opacity="1">
+  </path>
+</svg>`;
+
             closeBtn.onclick = function () {
-                // if (event.target === closeBtn) {
                 closeModalWithAnimation(modal);
-                // }
             };
 
-            const title = document.createElement('h3');
-            title.textContent = '版权警示';
+            // const title = document.createElement('h3');
+            // title.textContent = '版权警示';
 
-            const info01 = document.createElement('p');
+            const info01 = document.createElement('h2');
             info01.innerHTML = '本工具仅供个人学习和研究使用，请勿用于商业用途。';
             const info02 = document.createElement('p');
             info02.innerHTML = '所有表盘资源的版权归原作者所有，请尊重知识产权；通过本工具下载到的表盘资源，请勿进行二次分发、修改或用于商业目的。';
@@ -987,8 +1013,10 @@
             const info04 = document.createElement('p');
             info04.innerHTML = '请在使用本工具前自行仔细阅读并遵守相关法律法规。';
 
-            content.appendChild(closeBtn);
-            content.appendChild(title);
+            content.appendChild(header);
+            header.appendChild(headerContent);
+            header.appendChild(closeBtn);
+            // content.appendChild(title);
             content.appendChild(info01);
             content.appendChild(info02);
             content.appendChild(info03);
@@ -1053,8 +1081,6 @@
                 event.stopPropagation();
             }
         });
-
-
     </script>
 </body>
 
