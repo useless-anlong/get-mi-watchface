@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" style="--primary-color: #236eff; --success-color: #12b875;">
 
 <head>
     <meta charset="UTF-8">
@@ -167,6 +167,7 @@
                 initializeUI();
             } catch (error) {
                 console.error('加载配置文件失败:', error);
+                showConfigErrorModal();
             }
         }
 
@@ -215,6 +216,78 @@
             if (startSelect.options.length > 0) {
                 startSelect.dispatchEvent(new Event('change'));
             }
+        }
+
+        function showConfigErrorModal() {
+            // 创建一个轻量级的模态对话框
+            const modal = document.createElement('div');
+            modal.className = 'light-modal config-error-modal';
+
+            const content = document.createElement('div');
+            content.className = 'light-modal-content';
+            content.style.display = 'flex';
+            content.style.flexDirection = 'column';
+            content.style.alignItems = 'center';
+            content.style.justifyContent = 'space-between';
+            content.style.height = '50%';
+            content.style.maxHeight = '400px';
+            content.style.maxWidth = '600px';
+
+            const secTitle = document.createElement('h3');
+            secTitle.innerHTML = '无法加载配置文件 (config.json)<p>请确保配置文件 config.json 已存储于正确位置且文件格式正确</p>';
+            secTitle.style.fontSize = '24px';
+            secTitle.style.display = 'flex';
+            secTitle.style.alignItems = 'center';
+            secTitle.style.justifyContent = 'center';
+            secTitle.style.gap = '6px';
+            secTitle.style.flexDirection = 'column';
+
+            const errorIcon = document.createElement('div');
+            errorIcon.innerHTML = `<svg width="18" height="18" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M10.91 2.782a2.25 2.25 0 0 1 2.975.74l.083.138 7.759 14.009a2.25 2.25 0 0 1-1.814 3.334l-.154.006H4.243a2.25 2.25 0 0 1-2.041-3.197l.072-.143L10.031 3.66a2.25 2.25 0 0 1 .878-.878Zm9.505 15.613-7.76-14.008a.75.75 0 0 0-1.254-.088l-.057.088-7.757 14.008a.75.75 0 0 0 .561 1.108l.095.006h15.516a.75.75 0 0 0 .696-1.028l-.04-.086-7.76-14.008 7.76 14.008ZM12 16.002a.999.999 0 1 1 0 1.997.999.999 0 0 1 0-1.997ZM11.995 8.5a.75.75 0 0 1 .744.647l.007.102.004 4.502a.75.75 0 0 1-1.494.103l-.006-.102-.004-4.502a.75.75 0 0 1 .75-.75Z"
+                    fill="currentColor" />
+            </svg><p style="color: rgb(195, 73, 74);">载入时遇到错误</p>`;
+            errorIcon.style.textAlign = 'center';
+            errorIcon.style.color = '#c3494a';
+            errorIcon.style.fontWeight = '450';
+            errorIcon.style.fontSize = '16px';
+            errorIcon.style.display = 'flex';
+            errorIcon.style.alignItems = 'flex-start';
+            errorIcon.style.justifyContent = 'center';
+            errorIcon.style.gap = '6px';
+            errorIcon.style.height = '56px';
+
+            const info = document.createElement('p');
+            info.innerHTML = '前端用户界面将无法继续运行，请检查配置文件并重试';
+            info.style.fontSize = '14px';
+            info.style.textAlign = 'center';
+            info.style.color = '#666';
+            info.style.display = 'flex';
+            info.style.flexDirection = 'column';
+            info.style.alignItems = 'center';
+
+            const actionBtn = document.createElement('button');
+            actionBtn.textContent = '重新加载';
+            actionBtn.style.marginTop = '15px';
+            actionBtn.style.border = 'none';
+            actionBtn.style.cursor = 'pointer';
+            actionBtn.style.width = '100%';
+            actionBtn.style.maxWidth = '256px';
+            actionBtn.classList.add('appButton');
+            actionBtn.setAttribute('id', 'startBtn');
+
+            actionBtn.onclick = function () {
+                closeModalWithAnimation(modal);
+                location.reload();
+            };
+            content.appendChild(errorIcon);
+            content.appendChild(secTitle);
+            content.appendChild(info);
+            info.appendChild(actionBtn);
+            modal.appendChild(content);
+
+            document.body.appendChild(modal);
         }
 
         let serverStatusChecker = null;
@@ -820,21 +893,7 @@
             }
         }
 
-        // 带动画的模态框关闭函数
-        function closeModalWithAnimation(modal) {
-            modal.classList.add('hide');
-            setTimeout(() => {
-                document.body.removeChild(modal);
-            }, 300); // 等待动画完成
-        }
-
         function showMenu() {
-            // const menu = document.getElementById('menu');
-            // if (menu.classList.contains('menu-visible')) {
-            //     menu.classList.remove('menu-visible');
-            // } else {
-            //     menu.classList.add('menu-visible');
-            // }
             const menu = document.getElementById('menu');
             menu.classList.toggle('menu-visible');
 
@@ -845,6 +904,14 @@
             const logsDiv = document.getElementById('logs');
             logsDiv.innerHTML = '<table id="logTable" class="log-table"><tbody><tr><td class="log-notfound"><span style="color:rgb(97, 97, 97);">[SERVER] Waiting for start search...</span></td></tr></tbody></table>';
             showMenu();
+        }
+
+        // 带动画的模态框关闭函数
+        function closeModalWithAnimation(modal) {
+            modal.classList.add('hide');
+            setTimeout(() => {
+                modal.remove(); // 完全移除元素
+            }, 300); // 等待动画完成
         }
 
         function showAboutInfo() {
@@ -859,7 +926,9 @@
             closeBtn.className = 'light-modal-close';
             closeBtn.innerHTML = '&times;';
             closeBtn.onclick = function () {
-                document.body.removeChild(modal);
+                // if (event.target === closeBtn) {
+                closeModalWithAnimation(modal);
+                // }
             };
 
             const logo = document.createElement('img');
@@ -901,7 +970,9 @@
             closeBtn.className = 'light-modal-close';
             closeBtn.innerHTML = '&times;';
             closeBtn.onclick = function () {
-                document.body.removeChild(modal);
+                // if (event.target === closeBtn) {
+                closeModalWithAnimation(modal);
+                // }
             };
 
             const title = document.createElement('h3');
@@ -939,7 +1010,7 @@
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 // 关闭所有模态框
-                const modals = document.querySelectorAll('.light-modal');
+                const modals = document.querySelectorAll('.light-modal:not(.config-error-modal)');
                 modals.forEach(modal => {
                     closeModalWithAnimation(modal);
                 });
@@ -982,6 +1053,8 @@
                 event.stopPropagation();
             }
         });
+
+
     </script>
 </body>
 
